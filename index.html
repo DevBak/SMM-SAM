@@ -1,0 +1,3752 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMM – SAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy2: #0f2040;
+  --navy3: #162b52;
+  --blue: #1a5fd4;
+  --blue2: #2272ff;
+  --blue3: #4d94ff;
+  --blue4: #7ab3ff;
+  --accent: #3d8bff;
+  --white: #ffffff;
+  --gray1: #f0f4ff;
+  --gray2: #d8e4ff;
+  --gray3: #8fa8d9;
+  --gray4: #4a6291;
+  --tg: #229ED9;
+  --ig: #E1306C;
+  --success: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(10,22,40,0.25);
+  --trans: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"] {
+  --navy: #f0f4ff;
+  --navy2: #e4ecff;
+  --navy3: #d0dcff;
+  --blue: #1a5fd4;
+  --blue2: #2272ff;
+  --blue3: #4d94ff;
+  --blue4: #7ab3ff;
+  --accent: #1a5fd4;
+  --white: #0a1628;
+  --gray1: #1a2f54;
+  --gray2: #2a3f6a;
+  --gray3: #3a5080;
+  --gray4: #8fa8d9;
+  --shadow: 0 4px 24px rgba(10,22,40,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  min-height: 100vh;
+  transition: var(--trans);
+  overflow-x: hidden;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes countUp { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes borderGlow { 0%,100%{box-shadow:0 0 0 0 rgba(50,130,255,0.3)} 50%{box-shadow:0 0 0 6px rgba(50,130,255,0)} }
+
+.animated { animation: fadeIn 0.4s ease both; }
+
+/* HEADER */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,22,40,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+[data-theme="light"] header { background: rgba(240,244,255,0.92); border-bottom: 1px solid rgba(10,22,40,0.1); }
+.logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--blue3), var(--blue4));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.btn-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: var(--white);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: var(--trans);
+}
+.btn-icon:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+[data-theme="light"] .btn-icon { border-color: rgba(10,22,40,0.1); background: rgba(10,22,40,0.05); color: var(--white); }
+
+/* SIDEBAR */
+.layout { display: flex; min-height: calc(100vh - 64px); }
+.sidebar {
+  width: 240px;
+  min-height: calc(100vh - 64px);
+  background: var(--navy2);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  flex-shrink: 0;
+  transition: var(--trans);
+}
+[data-theme="light"] .sidebar { background: var(--navy2); border-right-color: rgba(10,22,40,0.08); }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray3);
+  transition: var(--trans);
+  position: relative;
+  overflow: hidden;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--blue2);
+  border-radius: 0 3px 3px 0;
+  transform: scaleY(0);
+  transition: var(--trans);
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+.nav-item.active { background: rgba(50,130,255,0.12); color: var(--blue3); }
+.nav-item.active::before { transform: scaleY(1); }
+.nav-icon { font-size: 18px; width: 20px; text-align: center; }
+.nav-section { font-size: 10px; font-weight: 700; color: var(--gray4); text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 14px 6px; }
+
+/* MAIN CONTENT */
+.main { flex: 1; padding: 28px 32px; max-width: 1200px; overflow-x: hidden; }
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+
+/* PAGE HEADERS */
+.page-header { margin-bottom: 28px; }
+.page-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.page-subtitle { font-size: 14px; color: var(--gray3); margin-top: 4px; }
+
+/* CARDS */
+.card {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: var(--trans);
+}
+.card:hover { border-color: rgba(50,130,255,0.2); }
+[data-theme="light"] .card { background: #fff; border-color: rgba(10,22,40,0.08); box-shadow: 0 2px 12px rgba(10,22,40,0.06); }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  animation: countUp 0.5s ease both;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--stat-color, var(--blue2));
+  opacity: 0.06;
+  transform: translate(20px, -20px);
+}
+[data-theme="light"] .stat-card { background: #fff; border-color: rgba(10,22,40,0.08); box-shadow: 0 2px 8px rgba(10,22,40,0.06); }
+.stat-icon { font-size: 22px; margin-bottom: 10px; }
+.stat-num { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+.stat-label { font-size: 12px; color: var(--gray3); margin-top: 2px; font-weight: 500; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: var(--trans);
+  border: none;
+  font-family: inherit;
+}
+.btn-primary {
+  background: var(--blue2);
+  color: white;
+  box-shadow: 0 4px 12px rgba(34,114,255,0.3);
+}
+.btn-primary:hover { background: var(--blue3); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(34,114,255,0.4); }
+.btn-secondary {
+  background: rgba(255,255,255,0.07);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.12); }
+.btn-danger { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+/* FORMS */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 13px; font-weight: 600; color: var(--gray3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: var(--white);
+  font-size: 14px;
+  font-family: inherit;
+  transition: var(--trans);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--blue2);
+  background: rgba(34,114,255,0.08);
+  box-shadow: 0 0 0 3px rgba(34,114,255,0.15);
+}
+.form-textarea { min-height: 100px; resize: vertical; }
+.form-select option { background: var(--navy2); color: var(--white); }
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select,
+[data-theme="light"] .form-textarea {
+  border-color: rgba(10,22,40,0.15);
+  background: rgba(10,22,40,0.03);
+  color: #0a1628;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+[data-theme="light"] .modal { background: #fff; border-color: rgba(10,22,40,0.12); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-title { font-size: 18px; font-weight: 700; }
+.modal-close { background: none; border: none; color: var(--gray3); font-size: 20px; cursor: pointer; padding: 4px; transition: var(--trans); }
+.modal-close:hover { color: var(--white); }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 10px; margin-bottom: 24px; }
+.tab {
+  flex: 1; padding: 8px 16px;
+  border-radius: 8px; border: none;
+  background: transparent; color: var(--gray3);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: var(--trans);
+  font-family: inherit;
+}
+.tab.active { background: var(--navy); color: var(--white); box-shadow: var(--shadow); }
+[data-theme="light"] .tab.active { background: #fff; color: #0a1628; }
+
+/* POST CARDS */
+.posts-list { display: flex; flex-direction: column; gap: 12px; }
+.post-card {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: var(--trans);
+  cursor: pointer;
+  animation: slideIn 0.3s ease both;
+}
+.post-card:hover { border-color: rgba(50,130,255,0.25); transform: translateX(2px); background: rgba(255,255,255,0.02); }
+[data-theme="light"] .post-card { background: #fff; border-color: rgba(10,22,40,0.08); box-shadow: 0 2px 8px rgba(10,22,40,0.05); }
+.post-platform {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.post-platform.tg { background: rgba(34,158,217,0.15); }
+.post-platform.ig { background: rgba(225,48,108,0.15); }
+.post-info { flex: 1; min-width: 0; }
+.post-channel { font-size: 12px; font-weight: 600; color: var(--gray3); margin-bottom: 4px; }
+.post-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.post-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--gray3); flex-wrap: wrap; }
+.post-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.post-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+}
+.status-planned { background: rgba(34,114,255,0.15); color: var(--blue3); }
+.status-published { background: rgba(34,197,94,0.15); color: var(--success); }
+.status-draft { background: rgba(245,158,11,0.15); color: var(--warn); }
+
+/* SCENARIO PANEL */
+.scenario-panel {
+  background: var(--navy3);
+  border: 1px solid rgba(50,130,255,0.2);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 16px;
+  animation: fadeIn 0.3s ease;
+}
+.scenario-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.scenario-text { font-size: 14px; line-height: 1.7; color: var(--gray2); white-space: pre-wrap; }
+
+/* CALENDAR */
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal-header { text-align: center; font-size: 12px; font-weight: 700; color: var(--gray3); padding: 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+.cal-day {
+  min-height: 80px;
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 6px;
+  transition: var(--trans);
+  cursor: pointer;
+  position: relative;
+}
+.cal-day:hover { border-color: rgba(50,130,255,0.3); background: rgba(255,255,255,0.03); }
+.cal-day.today { border-color: var(--blue2); box-shadow: 0 0 0 1px var(--blue2); }
+.cal-day.other-month { opacity: 0.35; }
+[data-theme="light"] .cal-day { background: #fff; border-color: rgba(10,22,40,0.08); }
+.cal-num { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.cal-dot { display: flex; align-items: center; gap: 3px; padding: 2px 4px; border-radius: 4px; font-size: 10px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+.cal-dot.tg { background: rgba(34,158,217,0.2); color: #60c8f0; }
+.cal-dot.ig { background: rgba(225,48,108,0.2); color: #f077a4; }
+
+/* CHANNEL CARDS */
+.channels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.channel-card {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: var(--trans);
+  animation: fadeIn 0.3s ease both;
+}
+.channel-card:hover { border-color: rgba(50,130,255,0.25); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+[data-theme="light"] .channel-card { background: #fff; border-color: rgba(10,22,40,0.08); }
+.channel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.channel-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.channel-icon.tg { background: rgba(34,158,217,0.15); }
+.channel-icon.ig { background: rgba(225,48,108,0.15); }
+.channel-name { font-size: 15px; font-weight: 700; }
+.channel-platform { font-size: 12px; color: var(--gray3); font-weight: 500; }
+.channel-stats { display: flex; gap: 12px; margin-bottom: 14px; }
+.channel-stat-mini { flex: 1; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px; text-align: center; }
+.channel-stat-mini .num { font-size: 18px; font-weight: 700; }
+.channel-stat-mini .lbl { font-size: 11px; color: var(--gray3); }
+.channel-actions { display: flex; gap: 8px; }
+
+/* SHARE VIEW (readonly) */
+.share-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(34,114,255,0.1); border: 1px solid rgba(34,114,255,0.2); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--blue3); margin-left: 10px; }
+
+/* BADGE PILLS */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.badge-tg { background: rgba(34,158,217,0.15); color: #60c8f0; }
+.badge-ig { background: rgba(225,48,108,0.15); color: #f077a4; }
+
+/* WEEK VIEW */
+.week-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 1px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+.week-header { background: var(--navy2); padding: 10px 6px; text-align: center; font-size: 12px; font-weight: 700; color: var(--gray3); }
+.week-time { background: var(--navy2); padding: 10px 8px; font-size: 11px; color: var(--gray4); }
+.week-cell { background: var(--navy2); padding: 4px; min-height: 56px; position: relative; }
+.week-cell:hover { background: rgba(255,255,255,0.03); }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--gray3); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.empty-state p { font-size: 15px; font-weight: 500; }
+.empty-state span { font-size: 13px; display: block; margin-top: 4px; opacity: 0.7; }
+
+/* DROPDOWN */
+.dropdown { position: relative; }
+.dropdown-menu {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 6px;
+  min-width: 160px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  z-index: 50;
+  display: none;
+  animation: fadeIn 0.2s ease;
+}
+.dropdown-menu.open { display: block; }
+.dropdown-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--white); cursor: pointer; transition: var(--trans); }
+.dropdown-item:hover { background: rgba(255,255,255,0.07); }
+[data-theme="light"] .dropdown-menu { background: #fff; border-color: rgba(10,22,40,0.12); box-shadow: 0 12px 32px rgba(10,22,40,0.15); }
+[data-theme="light"] .dropdown-item { color: #0a1628; }
+
+/* SECTION DIVIDER */
+.section-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-title { font-size: 16px; font-weight: 700; }
+
+/* TOAST */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--navy2); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; min-width: 240px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; }
+.toast.success { border-color: rgba(34,197,94,0.3); }
+.toast.error { border-color: rgba(239,68,68,0.3); }
+
+/* SHARE MODAL LINK */
+.share-link-box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-family: monospace; word-break: break-all; }
+[data-theme="light"] .share-link-box { background: rgba(10,22,40,0.04); border-color: rgba(10,22,40,0.12); color: #0a1628; }
+
+/* FILTER ROW */
+.filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-chip { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: var(--gray3); transition: var(--trans); font-family: inherit; }
+.filter-chip.active { background: var(--blue2); border-color: var(--blue2); color: white; }
+.filter-chip:hover:not(.active) { border-color: rgba(50,130,255,0.4); color: var(--white); }
+
+/* MOBILE SIDEBAR TOGGLE */
+.sidebar-toggle { display: none; }
+@media (max-width: 900px) {
+  .sidebar { position: fixed; left: -250px; top: 64px; z-index: 90; height: calc(100vh - 64px); transition: left 0.3s ease; }
+  .sidebar.open { left: 0; }
+  .sidebar-toggle { display: flex; }
+  .main { padding: 20px 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .calendar-grid { gap: 3px; }
+  .cal-day { min-height: 60px; }
+  .channels-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .post-actions { flex-direction: column; }
+  .week-grid { grid-template-columns: 40px repeat(7,1fr); }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* COLOR PICKER */
+.color-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-opt { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: var(--trans); }
+.color-opt.selected, .color-opt:hover { border-color: white; transform: scale(1.15); }
+
+/* STRATEGY BOARD */
+.strategy-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.strategy-col { background: var(--navy2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 16px; min-height: 200px; }
+.strategy-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 700; }
+.strategy-col-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; display: inline-block; }
+.strategy-card { background: var(--navy3); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 12px; margin-bottom: 8px; font-size: 13px; line-height: 1.5; cursor: pointer; transition: var(--trans); position: relative; }
+.strategy-card:hover { border-color: rgba(50,130,255,0.3); transform: translateY(-1px); }
+.strategy-card .card-tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; margin-bottom: 5px; }
+.strategy-card .card-actions { position: absolute; top: 8px; right: 8px; display: none; gap: 4px; }
+.strategy-card:hover .card-actions { display: flex; }
+.add-card-btn { width: 100%; background: transparent; border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; color: var(--gray3); font-size: 13px; cursor: pointer; transition: var(--trans); display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
+.add-card-btn:hover { border-color: rgba(50,130,255,0.4); color: var(--blue3); background: rgba(50,130,255,0.04); }
+[data-theme="light"] .strategy-col { background: #f8f9ff; border-color: rgba(10,22,40,0.08); }
+[data-theme="light"] .strategy-card { background: #fff; border-color: rgba(10,22,40,0.1); }
+
+/* DIAGRAM / MINDMAP */
+.diagram-container { background: var(--navy2); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; overflow: auto; }
+.diagram-canvas { position: relative; min-height: 400px; }
+
+/* TEAM / MOBILOGRAPH */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.team-card { background: var(--navy2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 18px; text-align: center; transition: var(--trans); animation: fadeIn 0.3s ease both; }
+.team-card:hover { border-color: rgba(50,130,255,0.25); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+[data-theme="light"] .team-card { background: #fff; border-color: rgba(10,22,40,0.08); }
+.team-avatar { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 12px; }
+.team-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.team-role { font-size: 12px; color: var(--gray3); margin-bottom: 12px; }
+.team-stats-row { display: flex; gap: 8px; }
+.team-stat { flex: 1; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 6px 4px; text-align: center; }
+.team-stat .n { font-size: 16px; font-weight: 700; }
+.team-stat .l { font-size: 10px; color: var(--gray3); }
+
+/* VIDEO STATS */
+.video-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.video-stat-box { background: var(--navy2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 16px; text-align: center; position: relative; overflow: hidden; }
+.video-stat-box::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; border-radius: 0 0 var(--radius) var(--radius); }
+.video-stat-box.reels::before { background: linear-gradient(90deg, #E1306C, #f77ab9); }
+.video-stat-box.story::before { background: linear-gradient(90deg, #f59e0b, #fde68a); }
+.video-stat-box.video::before { background: linear-gradient(90deg, #2272ff, #7ab3ff); }
+.video-stat-box.total::before { background: linear-gradient(90deg, #22c55e, #86efac); }
+.video-stat-box .v-num { font-size: 30px; font-weight: 800; letter-spacing: -1px; }
+.video-stat-box .v-lbl { font-size: 12px; color: var(--gray3); margin-top: 2px; }
+[data-theme="light"] .video-stat-box { background: #fff; border-color: rgba(10,22,40,0.08); }
+.week-report { background: var(--navy2); border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+[data-theme="light"] .week-report { background: #fff; border-color: rgba(10,22,40,0.08); }
+.week-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.week-bar-label { font-size: 12px; color: var(--gray3); width: 80px; flex-shrink: 0; }
+.week-bar-track { flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px; height: 8px; overflow: hidden; }
+.week-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.week-bar-val { font-size: 12px; font-weight: 700; width: 24px; text-align: right; flex-shrink: 0; }
+
+/* CONTENT TYPE BADGE */
+.ctype-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+.ctype-reels { background: rgba(225,48,108,0.15); color: #f077a4; }
+.ctype-story { background: rgba(245,158,11,0.15); color: var(--warn); }
+.ctype-video { background: rgba(34,114,255,0.15); color: var(--blue3); }
+.ctype-post { background: rgba(139,92,246,0.15); color: #a78bfa; }
+
+/* PROGRESS RING */
+.prog-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.prog-ring svg { transform: rotate(-90deg); }
+.prog-ring .prog-text { position: absolute; font-size: 13px; font-weight: 800; }
+
+/* ANALYSIS */
+.analysis-account-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.analysis-card { background: var(--navy2); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); overflow: hidden; transition: var(--trans); animation: fadeIn 0.3s ease both; }
+.analysis-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.25); }
+[data-theme="light"] .analysis-card { background: #fff; border-color: rgba(10,22,40,0.08); }
+.analysis-card-top { padding: 16px 18px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
+[data-theme="light"] .analysis-card-top { border-bottom-color: rgba(10,22,40,0.06); }
+.analysis-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.analysis-account-name { font-size: 14px; font-weight: 700; }
+.analysis-platform-tag { font-size: 11px; color: var(--gray3); }
+.analysis-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(255,255,255,0.05); }
+[data-theme="light"] .analysis-metrics { background: rgba(10,22,40,0.05); }
+.analysis-metric { background: var(--navy2); padding: 10px 8px; text-align: center; }
+[data-theme="light"] .analysis-metric { background: #fff; }
+.analysis-metric .am-val { font-size: 15px; font-weight: 800; }
+.analysis-metric .am-lbl { font-size: 10px; color: var(--gray3); margin-top: 1px; }
+.analysis-card-body { padding: 12px 16px; }
+.analysis-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; margin: 2px; }
+.strength-tag { background: rgba(34,197,94,0.12); color: #4ade80; }
+.weakness-tag { background: rgba(239,68,68,0.12); color: #f87171; }
+.opportunity-tag { background: rgba(34,114,255,0.12); color: var(--blue3); }
+.analysis-score-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.analysis-score-label { font-size: 11px; color: var(--gray3); width: 90px; flex-shrink: 0; }
+.analysis-score-track { flex: 1; background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; overflow: hidden; }
+.analysis-score-fill { height: 100%; border-radius: 4px; }
+.analysis-score-val { font-size: 11px; font-weight: 700; width: 28px; text-align: right; flex-shrink: 0; }
+.swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.swot-cell { border-radius: 10px; padding: 12px; }
+.swot-cell.s { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.swot-cell.w { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+.swot-cell.o { background: rgba(34,114,255,0.08); border: 1px solid rgba(34,114,255,0.2); }
+.swot-cell.t { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); }
+.swot-title { font-size: 12px; font-weight: 800; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.swot-item { font-size: 12px; color: var(--gray2); margin-bottom: 3px; padding-left: 8px; position: relative; line-height: 1.4; }
+.swot-item::before { content: '•'; position: absolute; left: 0; }
+
+/* DAILY LOG */
+.daily-log-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.daily-log-card { background: var(--navy2); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 14px 16px; }
+[data-theme="light"] .daily-log-card { background: #fff; border-color: rgba(10,22,40,0.08); }
+.dlc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.dlc-avatar { width: 48px; height: 48px; border-radius: 14px; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden; }
+.dlc-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.dlc-name { font-size: 14px; font-weight: 700; }
+.dlc-role { font-size: 11px; color: var(--gray3); }
+.dlc-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dlc-input-group label { font-size: 10px; color: var(--gray3); font-weight: 600; display: block; margin-bottom: 3px; text-transform: uppercase; }
+.dlc-input { width: 100%; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: var(--white); font-size: 14px; font-weight: 700; text-align: center; outline: none; font-family: inherit; }
+.dlc-input:focus { border-color: var(--blue2); background: rgba(34,114,255,0.08); }
+[data-theme="light"] .dlc-input { border-color: rgba(10,22,40,0.15); background: rgba(10,22,40,0.03); color: #0a1628; }
+.dlc-totals { display: flex; gap: 6px; margin-top: 10px; }
+.dlc-total-chip { flex: 1; background: rgba(255,255,255,0.04); border-radius: 7px; padding: 5px 4px; text-align: center; font-size: 10px; color: var(--gray3); }
+.dlc-total-chip strong { display: block; font-size: 16px; font-weight: 800; color: var(--white); }
+[data-theme="light"] .dlc-total-chip strong { color: #0a1628; }
+.dlc-save-btn { width: 100%; margin-top: 10px; padding: 7px; border-radius: 8px; background: rgba(34,114,255,0.15); border: 1px solid rgba(34,114,255,0.3); color: var(--blue3); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: var(--trans); }
+.dlc-save-btn:hover { background: rgba(34,114,255,0.25); }
+
+/* TEAM PHOTO UPLOAD */
+.photo-upload-area { border: 2px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; transition: var(--trans); position: relative; }
+.photo-upload-area:hover { border-color: var(--blue2); background: rgba(34,114,255,0.05); }
+.photo-upload-area img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; margin-bottom: 6px; }
+.photo-upload-area p { font-size: 12px; color: var(--gray3); }
+#photoInput { display: none; }
+
+/* SUMMARY SECTION */
+.summary-section { margin-top: 28px; }
+.summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.summary-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.04); padding: 4px; border-radius: 10px; }
+.summary-tab { padding: 7px 16px; border-radius: 7px; border: none; background: transparent; color: var(--gray3); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: var(--trans); }
+.summary-tab.active { background: var(--navy); color: var(--white); }
+[data-theme="light"] .summary-tab.active { background: #fff; color: #0a1628; }
+.summary-card { background: var(--navy2); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+[data-theme="light"] .summary-card { background: #fff; border-color: rgba(10,22,40,0.08); }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.summary-stat { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px; text-align: center; }
+.summary-stat .ss-num { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+.summary-stat .ss-label { font-size: 11px; color: var(--gray3); margin-top: 2px; }
+.summary-text { font-size: 14px; line-height: 1.8; color: var(--gray2); border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
+.summary-text strong { color: var(--white); }
+[data-theme="light"] .summary-text { border-top-color: rgba(10,22,40,0.06); }
+[data-theme="light"] .summary-text strong { color: #0a1628; }
+.member-row-summary { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+[data-theme="light"] .member-row-summary { border-bottom-color: rgba(10,22,40,0.06); }
+.member-row-summary:last-child { border-bottom: none; }
+.mrs-avatar { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 16px; overflow: hidden; flex-shrink: 0; }
+.mrs-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.mrs-name { flex: 1; font-size: 13px; font-weight: 600; }
+.mrs-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.mrs-chip { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+
+/* DASHBOARD CHARTS */
+.dash-charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+@media (max-width: 700px) { .dash-charts-row { grid-template-columns: 1fr; } }
+.chart-card { background: var(--navy2); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius); padding: 18px; }
+[data-theme="light"] .chart-card { background: #fff; border-color: rgba(10,22,40,0.08); }
+.chart-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
+.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s cubic-bezier(0.4,0,0.2,1); min-height: 4px; }
+.bar-label { font-size: 9px; color: var(--gray3); font-weight: 600; text-align: center; }
+.bar-val { font-size: 10px; font-weight: 700; }
+.donut-wrap { display: flex; align-items: center; gap: 16px; }
+.donut-legend { display: flex; flex-direction: column; gap: 6px; }
+.donut-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.donut-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* EXCEL EXPORT BTN */
+.excel-btn { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); color: var(--success); display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: var(--trans); }
+.excel-btn:hover { background: rgba(34,197,94,0.22); }
+
+/* XULOSA PAGE */
+.xulosa-hero {
+  background: linear-gradient(135deg, rgba(34,114,255,0.15), rgba(139,92,246,0.1));
+  border: 1px solid rgba(34,114,255,0.2);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.xulosa-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.xulosa-range { font-size: 13px; color: var(--gray3); margin-bottom: 20px; }
+.xulosa-big-stats { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
+.xulosa-big-stat { text-align: center; }
+.xulosa-big-num { font-size: 48px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+.xulosa-big-lbl { font-size: 12px; color: var(--gray3); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.xulosa-section { background: var(--navy2); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 22px; margin-bottom: 18px; }
+[data-theme="light"] .xulosa-section { background: #fff; border-color: rgba(10,22,40,0.08); }
+.xulosa-section-title { font-size: 15px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.xulosa-member-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+[data-theme="light"] .xulosa-member-row { border-bottom-color: rgba(10,22,40,0.06); }
+.xulosa-member-row:last-child { border-bottom: none; }
+.xulosa-rank { width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+.xulosa-avatar { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; overflow: hidden; flex-shrink: 0; }
+.xulosa-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.xulosa-member-info { flex: 1; min-width: 0; }
+.xulosa-member-name { font-size: 14px; font-weight: 700; }
+.xulosa-member-role { font-size: 11px; color: var(--gray3); }
+.xulosa-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.xulosa-chip { padding: 4px 10px; border-radius: 7px; font-size: 12px; font-weight: 700; }
+.xulosa-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.xulosa-bar-label { width: 80px; font-size: 12px; color: var(--gray3); font-weight: 600; flex-shrink: 0; }
+.xulosa-bar-track { flex: 1; height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
+.xulosa-bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.xulosa-bar-val { width: 36px; text-align: right; font-size: 13px; font-weight: 800; }
+.xulosa-insight { background: rgba(34,114,255,0.06); border: 1px solid rgba(34,114,255,0.12); border-left: 3px solid var(--blue2); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; font-size: 14px; line-height: 1.7; color: var(--gray2); }
+.xulosa-insight strong { color: var(--white); }
+[data-theme="light"] .xulosa-insight strong { color: #0a1628; }
+.xulosa-trophy { font-size: 18px; }
+@media print { .sidebar, header, .tabs { display: none !important; } .main { padding: 0 !important; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="btn-icon sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="logo">SMM – SAM</div>
+    <div id="shareIndicator" style="display:none">
+      <span class="share-badge">👁 Ko'rish rejimi</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-icon" onclick="shareView()" title="Ulashish" id="shareBtn">🔗</button>
+    <button class="btn-icon" onclick="toggleTheme()" title="Tema" id="themeBtn">🌙</button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="nav-section">Asosiy</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('planner',this)">
+      <span class="nav-icon">📅</span> Content Plan
+    </div>
+    <div class="nav-item" onclick="showPage('calendar',this)">
+      <span class="nav-icon">🗓</span> Kalendar
+    </div>
+    <div class="nav-section">Kanallar</div>
+    <div class="nav-item" onclick="showPage('channels',this)">
+      <span class="nav-icon">📡</span> Kanallar
+    </div>
+    <div class="nav-item" onclick="showPage('telegram',this)">
+      <span class="nav-icon">✈️</span> Telegram
+    </div>
+    <div class="nav-item" onclick="showPage('instagram',this)">
+      <span class="nav-icon">📸</span> Instagram
+    </div>
+    <div class="nav-section">Boshqaruv</div>
+    <div class="nav-item" onclick="showPage('scenarios',this)">
+      <span class="nav-icon">✍️</span> Ssenariylar
+    </div>
+    <div class="nav-item" onclick="showPage('strategy',this)">
+      <span class="nav-icon">🎯</span> SMM Strategiya
+    </div>
+    <div class="nav-item" onclick="showPage('team',this)">
+      <span class="nav-icon">👥</span> Xodimlar
+    </div>
+    <div class="nav-item" onclick="showPage('videostats',this)">
+      <span class="nav-icon">🎬</span> Video Hisobi
+    </div>
+    <div class="nav-item" onclick="showPage('xulosa',this)">
+      <span class="nav-icon">📋</span> Xulosa
+    </div>
+    <div class="nav-item" onclick="showPage('analysis',this)">
+      <span class="nav-icon">🔍</span> Raqobat Analizi
+    </div>
+    <div class="nav-item" onclick="showPage('settings',this)">
+      <span class="nav-icon">⚙️</span> Sozlamalar
+    </div>
+    <div style="flex:1"></div>
+    <div style="padding:12px 14px;font-size:12px;color:var(--gray4)">v2.0 • SMM–SAM</div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard 📊</div>
+        <div class="page-subtitle">Umumiy statistika va bugungi rejalar</div>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="dash-charts-row">
+        <div class="chart-card">
+          <div class="chart-title">📊 Content turlari</div>
+          <div class="donut-wrap" id="dashDonut"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">📅 So'nggi 7 kun</div>
+          <div class="bar-chart" id="dashBarChart"></div>
+        </div>
+      </div>
+      <div class="section-row">
+        <div class="section-title">Yaqinlashayotgan postlar</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddPost()">+ Yangi post</button>
+      </div>
+      <div class="posts-list" id="upcomingPosts"></div>
+    </div>
+
+    <!-- CONTENT PLANNER -->
+    <div class="page" id="page-planner">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">Content Plan 📋</div>
+            <div class="page-subtitle">Barcha postlaringiz ro'yxati</div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddPost()">+ Yangi post</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="setPlanTab('all',this)">Barchasi</button>
+        <button class="tab" onclick="setPlanTab('planned',this)">Rejalashtirilgan</button>
+        <button class="tab" onclick="setPlanTab('published',this)">E'lon qilindi</button>
+        <button class="tab" onclick="setPlanTab('draft',this)">Qoralama</button>
+      </div>
+      <div class="filter-row" id="planFilters"></div>
+      <div class="posts-list" id="allPosts"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">Kalendar 🗓</div>
+            <div class="page-subtitle" id="calMonthLabel"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="tabs" style="margin:0;">
+              <button class="tab active" onclick="setCalView('month',this)">Oylik</button>
+              <button class="tab" onclick="setCalView('week',this)">Haftalik</button>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="changeMonth(-1)">‹</button>
+            <button class="btn btn-secondary btn-sm" onclick="changeMonth(1)">›</button>
+          </div>
+        </div>
+      </div>
+      <div id="calendarView"></div>
+    </div>
+
+    <!-- CHANNELS -->
+    <div class="page" id="page-channels">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">Kanallar 📡</div>
+            <div class="page-subtitle">Telegram va Instagram kanallarini boshqaring</div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddChannel()">+ Kanal qo'shish</button>
+        </div>
+      </div>
+      <div class="channels-grid" id="channelsGrid"></div>
+    </div>
+
+    <!-- TELEGRAM -->
+    <div class="page" id="page-telegram">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">✈️ Telegram</div>
+            <div class="page-subtitle">Telegram kanallari uchun content plan</div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddPost('telegram')">+ Post qo'shish</button>
+        </div>
+      </div>
+      <div class="posts-list" id="telegramPosts"></div>
+    </div>
+
+    <!-- INSTAGRAM -->
+    <div class="page" id="page-instagram">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">📸 Instagram</div>
+            <div class="page-subtitle">Instagram kanallari uchun content plan</div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddPost('instagram')">+ Post qo'shish</button>
+        </div>
+      </div>
+      <div class="posts-list" id="instagramPosts"></div>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="page" id="page-scenarios">
+      <div class="page-header">
+        <div class="page-title">✍️ Ssenariylar</div>
+        <div class="page-subtitle">Postlarning to'liq skriptlari va matni</div>
+      </div>
+      <div class="posts-list" id="scenariosList"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div class="page-title">⚙️ Sozlamalar</div>
+        <div class="page-subtitle">Ilova sozlamalari</div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="section-title" style="margin-bottom:16px">Ko'rinish</div>
+        <div class="form-group">
+          <label class="form-label">Mavzu</label>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-secondary" onclick="setTheme('dark')">🌙 Qorong'u</button>
+            <button class="btn btn-secondary" onclick="setTheme('light')">☀️ Yorug'</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="section-title" style="margin-bottom:16px">Ma'lumotlar</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="exportData()">⬇ Export (JSON)</button>
+          <button class="btn btn-secondary" onclick="importDataTrigger()">⬆ Import (JSON)</button>
+          <button class="btn btn-danger" onclick="clearAll()">🗑 Barchasini o'chirish</button>
+        </div>
+        <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px">Haqida</div>
+        <p style="font-size:14px;color:var(--gray3);line-height:1.7">
+          <strong>SMM – SAM</strong> — professional SMM content rejalashtirish ilovasi.<br>
+          Telegram va Instagram uchun kunlik, haftalik va oylik rejalar tuzish imkoniyati.<br>
+          Barcha ma'lumotlar qurilmangizda saqlanadi.
+        </p>
+      </div>
+    </div>
+
+    <!-- STRATEGY -->
+    <div class="page" id="page-strategy">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">🎯 SMM Strategiya</div>
+            <div class="page-subtitle">Maqsadlar, auditoriya, yo'nalishlar va strategik reja</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="addStrategyCard()">+ Karta qo'shish</button>
+            <button class="btn btn-primary btn-sm" onclick="openMindmap()">🗺 Diagram</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategy Meta -->
+      <div class="card" style="margin-bottom:20px" id="strategyMetaCard">
+        <div class="section-title" style="margin-bottom:14px">📋 Asosiy Ma'lumotlar</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Sahifa/Kanal nomi</label>
+            <input class="form-input" id="stratPageName" placeholder="@username yoki kanal nomi" oninput="saveStrategyMeta()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Asosiy maqsad</label>
+            <input class="form-input" id="stratGoal" placeholder="Masalan: 10K obuna" oninput="saveStrategyMeta()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Davr</label>
+            <input class="form-input" id="stratPeriod" placeholder="Masalan: 2025 Q1" oninput="saveStrategyMeta()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Byudjet</label>
+            <input class="form-input" id="stratBudget" placeholder="Masalan: $500/oy" oninput="saveStrategyMeta()">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px;margin-bottom:0">
+          <label class="form-label">Auditoriya tavsifi</label>
+          <textarea class="form-textarea" id="stratAudience" placeholder="Maqsadli auditoriya: yoshi, qiziqishlari, qayerda yashaydi..." style="min-height:70px" oninput="saveStrategyMeta()"></textarea>
+        </div>
+      </div>
+
+      <!-- Board -->
+      <div class="strategy-board" id="strategyBoard"></div>
+
+      <!-- Mindmap Modal -->
+      <div class="modal-overlay" id="mindmapModal">
+        <div class="modal" style="max-width:760px;width:100%">
+          <div class="modal-header">
+            <div class="modal-title">🗺 Strategiya Diagrammasi</div>
+            <button class="modal-close" onclick="document.getElementById('mindmapModal').classList.remove('open')">✕</button>
+          </div>
+          <div class="diagram-container" style="margin:0">
+            <canvas id="mindmapCanvas" style="width:100%;border-radius:8px;background:var(--navy3)" width="700" height="420"></canvas>
+          </div>
+          <div style="margin-top:12px;font-size:13px;color:var(--gray3);text-align:center">Strategiya kartalari diagrammada ko'rsatilmoqda</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('mindmapModal').classList.remove('open')">Yopish</button>
+            <button class="btn btn-primary" onclick="downloadMindmap()">⬇ Yuklab olish</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add card modal -->
+      <div class="modal-overlay" id="stratCardModal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title" id="stratCardModalTitle">Yangi karta</div>
+            <button class="modal-close" onclick="closeStratCardModal()">✕</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ustun</label>
+            <select class="form-select" id="stratCardCol">
+              <option value="goals">🎯 Maqsadlar</option>
+              <option value="audience">👥 Auditoriya</option>
+              <option value="content">📝 Content yo'nalish</option>
+              <option value="kpi">📊 KPI</option>
+              <option value="ideas">💡 G'oyalar</option>
+              <option value="risks">⚠️ Risklar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sarlavha</label>
+            <input class="form-input" id="stratCardTitle" placeholder="Karta sarlavhasi...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tavsif</label>
+            <textarea class="form-textarea" id="stratCardDesc" placeholder="Batafsil ma'lumot..." style="min-height:80px"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Muhimlik</label>
+            <select class="form-select" id="stratCardPriority">
+              <option value="high">🔴 Yuqori</option>
+              <option value="mid">🟡 O'rta</option>
+              <option value="low">🟢 Past</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeStratCardModal()">Bekor</button>
+            <button class="btn btn-primary" onclick="saveStratCard()">Saqlash ✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="page" id="page-team">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">👥 Xodimlar</div>
+            <div class="page-subtitle">Mobilograflar va jamoangiz a'zolari</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="excel-btn" onclick="exportTeamExcel()">📊 Excel hisobot</button>
+            <button class="btn btn-primary" onclick="openAddMember()">+ Xodim qo'shish</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAILY LOG -->
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="section-title">📅 Kunlik kiritish</div>
+            <div style="font-size:12px;color:var(--gray3);margin-top:2px">Har bir xodim uchun bugungi video va story sonini kiriting</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="date" id="logDate" class="form-input" style="width:auto;padding:7px 12px;font-size:13px">
+            <button class="btn btn-primary btn-sm" onclick="saveAllDailyLogs()">💾 Hammasini saqlash</button>
+          </div>
+        </div>
+        <div class="daily-log-grid" id="dailyLogGrid"></div>
+      </div>
+
+      <!-- TEAM CARDS -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="section-title">👤 Xodimlar ro'yxati</div>
+      </div>
+      <div class="team-grid" id="teamGrid"></div>
+
+      <!-- SUMMARY SECTION -->
+      <div class="summary-section">
+        <div class="summary-header">
+          <div class="section-title">📋 Avtomatik Xulosa</div>
+          <div class="summary-tabs">
+            <button class="summary-tab active" id="stab-week" onclick="setSummaryTab('week',this)">📅 Haftalik</button>
+            <button class="summary-tab" id="stab-month" onclick="setSummaryTab('month',this)">📆 Oylik</button>
+          </div>
+        </div>
+        <div id="summaryContent"></div>
+      </div>
+
+      <div class="modal-overlay" id="memberModal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title" id="memberModalTitle">Yangi xodim</div>
+            <button class="modal-close" onclick="closeMemberModal()">✕</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Profil rasmi</label>
+            <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+              <div id="photoPreview" style="font-size:48px;margin-bottom:6px">👤</div>
+              <p>Rasm yuklash uchun bosing</p>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ism</label>
+            <input class="form-input" id="memberName" placeholder="To'liq ismi...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lavozimi</label>
+            <select class="form-select" id="memberRole">
+              <option value="mobilograf">📱 Mobilograf</option>
+              <option value="smm">💻 SMM mutaxassis</option>
+              <option value="operator">🎥 Operator</option>
+              <option value="montaj">✂️ Montaj ustasi</option>
+              <option value="dizayner">🎨 Dizayner</option>
+              <option value="copywriter">✍️ Copywriter</option>
+              <option value="other">👤 Boshqa</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefon / Telegram</label>
+            <input class="form-input" id="memberContact" placeholder="+998 90 000 00 00 yoki @username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Oylik reja — 🎬 Reels soni</label>
+            <input type="number" class="form-input" id="memberMonthlyTarget" placeholder="Masalan: 20" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Oylik reja — 📱 Story soni</label>
+            <input type="number" class="form-input" id="memberMonthlyStoryTarget" placeholder="Masalan: 30" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Izoh</label>
+            <input class="form-input" id="memberNote" placeholder="Qo'shimcha ma'lumot...">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeMemberModal()">Bekor</button>
+            <button class="btn btn-primary" onclick="saveMember()">Saqlash ✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEO STATS -->
+    <div class="page" id="page-videostats">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">🎬 Video Hisobi</div>
+            <div class="page-subtitle">Reels, Story, Video — haftalik va oylik statistika</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select class="form-select" id="videoStatMonth" style="width:auto;padding:8px 12px" onchange="renderVideoStats()">
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="video-summary" id="videoSummary"></div>
+
+      <!-- Weekly breakdown -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-title" style="margin-bottom:16px">📅 Haftalik taqsimot</div>
+        <div id="weeklyBreakdown"></div>
+      </div>
+
+      <!-- Monthly history -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-title" style="margin-bottom:16px">📊 Turdagi statistika</div>
+        <div id="contentTypeChart"></div>
+      </div>
+
+      <!-- Detailed list -->
+      <div class="card">
+        <div class="section-row" style="margin-bottom:12px">
+          <div class="section-title">📋 Batafsil ro'yxat</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="filter-chip active" onclick="setVideoTypeFilter('all',this)" id="vtf-all">Barchasi</button>
+            <button class="filter-chip" onclick="setVideoTypeFilter('reels',this)" id="vtf-reels">🎬 Reels</button>
+            <button class="filter-chip" onclick="setVideoTypeFilter('story',this)" id="vtf-story">📱 Story</button>
+            <button class="filter-chip" onclick="setVideoTypeFilter('video',this)" id="vtf-video">🎥 Video</button>
+            <button class="filter-chip" onclick="setVideoTypeFilter('post',this)" id="vtf-post">📝 Post</button>
+          </div>
+        </div>
+        <div class="posts-list" id="videoDetailList"></div>
+      </div>
+    </div>
+
+    <!-- XULOSA (ALOHIDA SAHIFA) -->
+    <div class="page" id="page-xulosa">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">📋 Xulosa hisoboti</div>
+            <div class="page-subtitle">Haftalik va oylik natijalar tahlili</div>
+          </div>
+          <button class="btn btn-primary" onclick="printXulosa()">🖨️ Chop etish</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs" style="margin-bottom:24px">
+        <button class="tab active" id="xtab-week" onclick="setXulosaTabs('week',this)">📅 Haftalik xulosa</button>
+        <button class="tab" id="xtab-month" onclick="setXulosaTabs('month',this)">📆 Oylik xulosa</button>
+      </div>
+
+      <!-- Xulosa Content -->
+      <div id="xulosaSummaryContent"></div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="page" id="page-analysis">
+      <div class="page-header">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="page-title">🔍 Raqobat Analizi</div>
+            <div class="page-subtitle">Boshqa sahifalar va raqobatchilarni tahlil qiling</div>
+          </div>
+          <button class="btn btn-primary" onclick="openAddAnalysis()">+ Tahlil qo'shish</button>
+        </div>
+      </div>
+
+      <!-- Tabs: accounts / compare / notes -->
+      <div class="tabs" style="margin-bottom:20px">
+        <button class="tab active" id="atab-accounts" onclick="setAnalysisTab('accounts',this)">📊 Hisoblar</button>
+        <button class="tab" id="atab-compare" onclick="setAnalysisTab('compare',this)">⚖️ Taqqoslash</button>
+        <button class="tab" id="atab-notes" onclick="setAnalysisTab('notes',this)">📝 Tahlil eslatmalari</button>
+      </div>
+
+      <!-- ACCOUNTS TAB -->
+      <div id="analysisTab-accounts">
+        <div class="analysis-account-grid" id="analysisGrid"></div>
+      </div>
+
+      <!-- COMPARE TAB -->
+      <div id="analysisTab-compare" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title" style="margin-bottom:14px">⚖️ Hisoblarni taqqoslash</div>
+          <div id="compareTable"></div>
+        </div>
+      </div>
+
+      <!-- NOTES TAB -->
+      <div id="analysisTab-notes" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="section-title">📝 Tahlil eslatmalari</div>
+            <button class="btn btn-primary btn-sm" onclick="addAnalysisNote()">+ Eslatma</button>
+          </div>
+          <div id="analysisNotesList"></div>
+        </div>
+      </div>
+
+      <!-- ADD/EDIT ANALYSIS MODAL -->
+      <div class="modal-overlay" id="analysisModal">
+        <div class="modal" style="max-width:600px">
+          <div class="modal-header">
+            <div class="modal-title" id="analysisModalTitle">Yangi tahlil</div>
+            <button class="modal-close" onclick="closeAnalysisModal()">✕</button>
+          </div>
+          <!-- platform -->
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" id="aplatIg" onclick="selectAPlat('instagram')">📸 Instagram</button>
+              <button class="btn btn-secondary btn-sm" id="aplatTg" onclick="selectAPlat('telegram')">✈️ Telegram</button>
+              <button class="btn btn-secondary btn-sm" id="aplatYt" onclick="selectAPlat('youtube')">▶️ YouTube</button>
+              <button class="btn btn-secondary btn-sm" id="aplatTt" onclick="selectAPlat('tiktok')">🎵 TikTok</button>
+              <button class="btn btn-secondary btn-sm" id="aplatFb" onclick="selectAPlat('facebook')">📘 Facebook</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">Hisob nomi</label>
+              <input class="form-input" id="aName" placeholder="@username yoki kanal nomi">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Havola (ixtiyoriy)</label>
+              <input class="form-input" id="aUrl" placeholder="https://...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Obunachi soni</label>
+              <input class="form-input" id="aFollowers" placeholder="10000" type="number" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">O'rtacha ko'rishlar</label>
+              <input class="form-input" id="aViews" placeholder="5000" type="number" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Postlar soni</label>
+              <input class="form-input" id="aPosts" placeholder="120" type="number" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Engagement %</label>
+              <input class="form-input" id="aEngagement" placeholder="3.5" type="number" step="0.1" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Haftalik post soni</label>
+              <input class="form-input" id="aWeeklyPosts" placeholder="7" type="number" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tahlil sanasi</label>
+              <input class="form-input" id="aDate" type="date">
+            </div>
+          </div>
+          <!-- Scores -->
+          <div class="form-group">
+            <label class="form-label">Baholar (1–10)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div><label style="font-size:11px;color:var(--gray3)">Content sifati</label><input class="form-input" id="aScoreContent" type="number" min="1" max="10" placeholder="8"></div>
+              <div><label style="font-size:11px;color:var(--gray3)">Dizayn</label><input class="form-input" id="aScoreDesign" type="number" min="1" max="10" placeholder="7"></div>
+              <div><label style="font-size:11px;color:var(--gray3)">Faollik</label><input class="form-input" id="aScoreActivity" type="number" min="1" max="10" placeholder="6"></div>
+              <div><label style="font-size:11px;color:var(--gray3)">Auditoriya sifati</label><input class="form-input" id="aScoreAudience" type="number" min="1" max="10" placeholder="7"></div>
+            </div>
+          </div>
+          <!-- SWOT -->
+          <div class="form-group">
+            <label class="form-label">SWOT Tahlili</label>
+            <div class="swot-grid">
+              <div class="swot-cell s">
+                <div class="swot-title" style="color:#4ade80">💪 Kuchli tomonlar</div>
+                <textarea class="form-textarea" id="aSwotS" placeholder="Har qatorga bitta..." style="min-height:70px;background:transparent;border:none;padding:0;color:var(--gray2);font-size:12px"></textarea>
+              </div>
+              <div class="swot-cell w">
+                <div class="swot-title" style="color:#f87171">⚠️ Zaif tomonlar</div>
+                <textarea class="form-textarea" id="aSwotW" placeholder="Har qatorga bitta..." style="min-height:70px;background:transparent;border:none;padding:0;color:var(--gray2);font-size:12px"></textarea>
+              </div>
+              <div class="swot-cell o">
+                <div class="swot-title" style="color:var(--blue3)">🚀 Imkoniyatlar</div>
+                <textarea class="form-textarea" id="aSwotO" placeholder="Har qatorga bitta..." style="min-height:70px;background:transparent;border:none;padding:0;color:var(--gray2);font-size:12px"></textarea>
+              </div>
+              <div class="swot-cell t">
+                <div class="swot-title" style="color:var(--warn)">🔴 Tahdidlar</div>
+                <textarea class="form-textarea" id="aSwotT" placeholder="Har qatorga bitta..." style="min-height:70px;background:transparent;border:none;padding:0;color:var(--gray2);font-size:12px"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Umumiy tahlil / izoh</label>
+            <textarea class="form-textarea" id="aNotes" placeholder="Asosiy xulosalar, nima o'rganish mumkin, qanday ustunliklari bor..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeAnalysisModal()">Bekor</button>
+            <button class="btn btn-primary" onclick="saveAnalysis()">Saqlash ✓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD NOTE MODAL -->
+      <div class="modal-overlay" id="analysisNoteModal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title" id="noteModalTitle">Yangi eslatma</div>
+            <button class="modal-close" onclick="closeNoteModal()">✕</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sarlavha</label>
+            <input class="form-input" id="noteTitle" placeholder="Masalan: Raqobatchidan o'rganildi">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Turi</label>
+            <select class="form-select" id="noteType">
+              <option value="insight">💡 Insight</option>
+              <option value="action">✅ Harakat</option>
+              <option value="trend">📈 Trend</option>
+              <option value="warning">⚠️ Ogohlantirish</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Matn</label>
+            <textarea class="form-textarea" id="noteText" placeholder="Batafsil yozing..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tegishli hisob (ixtiyoriy)</label>
+            <select class="form-select" id="noteAccount">
+              <option value="">— Hisob tanlang —</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeNoteModal()">Bekor</button>
+            <button class="btn btn-primary" onclick="saveAnalysisNote()">Saqlash ✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<!-- ADD/EDIT POST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="postModalTitle">Yangi post qo'shish</div>
+      <button class="modal-close" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Platform</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" id="platTg" onclick="selectPlatform('telegram')">✈️ Telegram</button>
+        <button class="btn btn-secondary" id="platIg" onclick="selectPlatform('instagram')">📸 Instagram</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Kanal</label>
+      <select class="form-select" id="postChannel">
+        <option value="">Kanal tanlang</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content turi</label>
+      <select class="form-select" id="postContentType">
+        <option value="post">📝 Post</option>
+        <option value="reels">🎬 Reels</option>
+        <option value="story">📱 Story</option>
+        <option value="video">🎥 Video</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Post sarlavhasi</label>
+      <input type="text" class="form-input" id="postTitle" placeholder="Post mavzusi...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sana va vaqt</label>
+      <input type="datetime-local" class="form-input" id="postDate">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Holati</label>
+      <select class="form-select" id="postStatus">
+        <option value="planned">Rejalashtirilgan</option>
+        <option value="draft">Qoralama</option>
+        <option value="published">E'lon qilindi</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ssenariy / Matn</label>
+      <textarea class="form-textarea" id="postScenario" placeholder="Post matni, skript, hashteglar..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Izoh</label>
+      <input type="text" class="form-input" id="postNote" placeholder="Qo'shimcha izoh...">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closePostModal()">Bekor</button>
+      <button class="btn btn-primary" onclick="savePost()">Saqlash ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW POST MODAL -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="viewModalTitle"></div>
+      <button class="modal-close" onclick="closeViewModal()">✕</button>
+    </div>
+    <div id="viewModalBody"></div>
+    <div class="modal-footer" id="viewModalFooter"></div>
+  </div>
+</div>
+
+<!-- ADD CHANNEL MODAL -->
+<div class="modal-overlay" id="channelModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="channelModalTitle">Yangi kanal qo'shish</div>
+      <button class="modal-close" onclick="closeChannelModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Platform</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" id="chPlatTg" onclick="selectChPlatform('telegram')">✈️ Telegram</button>
+        <button class="btn btn-secondary" id="chPlatIg" onclick="selectChPlatform('instagram')">📸 Instagram</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Kanal nomi</label>
+      <input type="text" class="form-input" id="channelName" placeholder="Kanal nomi...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username / Handle</label>
+      <input type="text" class="form-input" id="channelUsername" placeholder="@username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tavsif</label>
+      <input type="text" class="form-input" id="channelDesc" placeholder="Kanal haqida qisqacha...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Rang</label>
+      <div class="color-options" id="colorOptions"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeChannelModal()">Bekor</button>
+      <button class="btn btn-primary" onclick="saveChannel()">Saqlash ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🔗 Ko'rish havolasi</div>
+      <button class="modal-close" onclick="document.getElementById('shareModal').classList.remove('open')">✕</button>
+    </div>
+    <p style="font-size:14px;color:var(--gray3);margin-bottom:16px;line-height:1.6">
+      Ushbu havola orqali boshqalar sizning content planingizni <strong>faqat ko'ra oladi</strong>. O'zgartira olmaydi. Siz o'zgartirsangiz, ular ham ko'radi.
+    </p>
+    <div class="form-group">
+      <label class="form-label">Havola</label>
+      <div class="share-link-box">
+        <span id="shareLinkText" style="flex:1;font-size:12px;word-break:break-all"></span>
+        <button class="btn btn-primary btn-sm" onclick="copyShareLink()">Nusxa</button>
+      </div>
+    </div>
+    <div style="background:rgba(34,114,255,0.08);border:1px solid rgba(34,114,255,0.2);border-radius:10px;padding:12px;font-size:13px;color:var(--blue3)">
+      💡 Havola brauzer xotirasiga asoslanadi. Siz bilan bir xil brauzerda ochilganda real vaqtda yangilanadi.
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('shareModal').classList.remove('open')">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ===========================
+// STATE & STORAGE
+// ===========================
+const STORAGE_KEY = 'smm_sam_data';
+const SHARE_KEY = 'smm_sam_shared';
+let editingPostId = null;
+let editingChannelId = null;
+let selectedPlatform = 'telegram';
+let selectedChPlatform = 'telegram';
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let calView = 'month';
+let planFilter = 'all';
+let planPlatformFilter = 'all';
+let isReadOnly = false;
+let currentXulosTab = 'week';
+
+function getData() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (!d) return { posts: [], channels: [], theme: 'dark' };
+    return JSON.parse(d);
+  } catch { return { posts: [], channels: [], theme: 'dark' }; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  localStorage.setItem(SHARE_KEY, JSON.stringify(data));
+}
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function checkReadOnly() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('view') === 'readonly') {
+    isReadOnly = true;
+    document.getElementById('shareBtn').style.display = 'none';
+    document.getElementById('shareIndicator').style.display = 'flex';
+    // Hide edit/delete buttons via CSS
+    const style = document.createElement('style');
+    style.textContent = '.edit-only { display: none !important; }';
+    document.head.appendChild(style);
+    // Try to load shared data from SHARE_KEY into STORAGE_KEY
+    try {
+      const sharedData = localStorage.getItem(SHARE_KEY);
+      if (sharedData) {
+        localStorage.setItem(STORAGE_KEY, sharedData);
+      }
+    } catch {}
+  }
+}
+
+// ===========================
+// NAVIGATION
+// ===========================
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + name + "'")) n.classList.add('active');
+    });
+  }
+  localStorage.setItem('smmsam_activePage', name);
+  if (window.innerWidth <= 900) closeSidebar();
+  renderPage(name);
+}
+
+function renderPage(name) {
+  if (name === 'dashboard') renderDashboard();
+  else if (name === 'planner') renderPlanner();
+  else if (name === 'calendar') renderCalendar();
+  else if (name === 'channels') renderChannels();
+  else if (name === 'telegram') renderPlatformPosts('telegram');
+  else if (name === 'instagram') renderPlatformPosts('instagram');
+  else if (name === 'scenarios') renderScenarios();
+  else if (name === 'strategy') renderStrategy();
+  else if (name === 'team') { renderTeam(); renderDailyLogGrid(); renderSummary('week'); }
+  else if (name === 'videostats') renderVideoStats();
+  else if (name === 'analysis') renderAnalysis();
+  else if (name === 'xulosa') renderXulosa(currentXulosTab || 'week');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ===========================
+// THEME
+// ===========================
+function toggleTheme() {
+  const data = getData();
+  data.theme = data.theme === 'dark' ? 'light' : 'dark';
+  saveData(data);
+  applyTheme(data.theme);
+}
+function setTheme(t) {
+  const data = getData();
+  data.theme = t;
+  saveData(data);
+  applyTheme(t);
+}
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : '');
+  document.getElementById('themeBtn').textContent = t === 'light' ? '🌙' : '☀️';
+}
+
+// ===========================
+// TOAST
+// ===========================
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==='success'?'✅':'❌'}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ===========================
+// DASHBOARD
+// ===========================
+function renderDashboard() {
+  const data = getData();
+  const posts = data.posts || [];
+  const channels = data.channels || [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const weekEnd = new Date(today); weekEnd.setDate(today.getDate()+7);
+
+  const todayPosts = posts.filter(p => { const d=new Date(p.date); d.setHours(0,0,0,0); return d.getTime()===today.getTime(); });
+  const weekPosts = posts.filter(p => { const d=new Date(p.date); return d>=today && d<=weekEnd; });
+  const tgCount = posts.filter(p=>p.platform==='telegram').length;
+  const igCount = posts.filter(p=>p.platform==='instagram').length;
+  const planned = posts.filter(p=>p.status==='planned').length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card animated" style="--stat-color:var(--blue2)">
+      <div class="stat-icon">📝</div>
+      <div class="stat-num">${posts.length}</div>
+      <div class="stat-label">Jami postlar</div>
+    </div>
+    <div class="stat-card animated" style="--stat-color:var(--tg);animation-delay:.05s">
+      <div class="stat-icon">✈️</div>
+      <div class="stat-num">${tgCount}</div>
+      <div class="stat-label">Telegram postlar</div>
+    </div>
+    <div class="stat-card animated" style="--stat-color:var(--ig);animation-delay:.1s">
+      <div class="stat-icon">📸</div>
+      <div class="stat-num">${igCount}</div>
+      <div class="stat-label">Instagram postlar</div>
+    </div>
+    <div class="stat-card animated" style="--stat-color:var(--success);animation-delay:.15s">
+      <div class="stat-icon">📡</div>
+      <div class="stat-num">${channels.length}</div>
+      <div class="stat-label">Kanallar</div>
+    </div>
+    <div class="stat-card animated" style="--stat-color:var(--warn);animation-delay:.2s">
+      <div class="stat-icon">📅</div>
+      <div class="stat-num">${todayPosts.length}</div>
+      <div class="stat-label">Bugun</div>
+    </div>
+    <div class="stat-card animated" style="--stat-color:var(--blue3);animation-delay:.25s">
+      <div class="stat-icon">📆</div>
+      <div class="stat-num">${weekPosts.length}</div>
+      <div class="stat-label">Bu hafta</div>
+    </div>
+    <div class="stat-card animated" style="--stat-color:var(--blue2);animation-delay:.3s">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-num">${planned}</div>
+      <div class="stat-label">Rejalashtirilgan</div>
+    </div>
+    <div class="stat-card animated" style="animation-delay:.35s">
+      <div class="stat-icon">✅</div>
+      <div class="stat-num">${posts.filter(p=>p.status==='published').length}</div>
+      <div class="stat-label">E'lon qilindi</div>
+    </div>
+  `;
+
+  const upcoming = posts.filter(p => p.status==='planned')
+    .sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0,5);
+  const container = document.getElementById('upcomingPosts');
+  if (!upcoming.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Rejalashtirilgan postlar yo'q</p><span>Yangi post qo'shish uchun + tugmasini bosing</span></div>`;
+  } else {
+    container.innerHTML = upcoming.map((p,i) => postCardHTML(p, i*0.05)).join('');
+  }
+
+  // Charts
+  renderDashCharts(posts);
+}
+
+// ===========================
+// POST CARD HTML
+// ===========================
+function postCardHTML(p, delay=0) {
+  const d = new Date(p.date);
+  const dateStr = d.toLocaleDateString('uz-UZ',{day:'2-digit',month:'short',year:'numeric'});
+  const timeStr = d.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+  const isPlatTg = p.platform==='telegram';
+  const statusMap = {planned:'status-planned',published:'status-published',draft:'status-draft'};
+  const statusLabel = {planned:'Rejalashtirilgan',published:"E'lon qilindi",draft:'Qoralama'};
+  const ctypeMap = {reels:'ctype-reels',story:'ctype-story',video:'ctype-video',post:'ctype-post'};
+  const ctypeLabel = {reels:'🎬 Reels',story:'📱 Story',video:'🎥 Video',post:'📝 Post'};
+  const data = getData();
+  const channel = (data.channels||[]).find(c=>c.id===p.channelId);
+  return `
+    <div class="post-card" style="animation-delay:${delay}s" onclick="viewPost('${p.id}')">
+      <div class="post-platform ${isPlatTg?'tg':'ig'}">${isPlatTg?'✈️':'📸'}</div>
+      <div class="post-info">
+        <div class="post-channel">${channel ? channel.name : (isPlatTg?'Telegram':'Instagram')} ${isPlatTg?'<span class="badge badge-tg">TG</span>':'<span class="badge badge-ig">IG</span>'}</div>
+        <div class="post-title">${p.title || 'Sarlavsiz post'}</div>
+        <div class="post-meta">
+          <span>📅 ${dateStr}</span>
+          <span>🕐 ${timeStr}</span>
+          ${p.contentType && p.contentType!=='post' ? `<span class="ctype-badge ${ctypeMap[p.contentType]||'ctype-post'}">${ctypeLabel[p.contentType]||p.contentType}</span>` : ''}
+          ${p.note ? `<span>💬 ${p.note}</span>` : ''}
+          <span class="post-status ${statusMap[p.status]||'status-draft'}">${statusLabel[p.status]||p.status}</span>
+        </div>
+      </div>
+      <div class="post-actions edit-only" onclick="event.stopPropagation()">
+        <button class="btn btn-secondary btn-sm" onclick="editPost('${p.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}')">🗑</button>
+      </div>
+    </div>
+  `;
+}
+
+// ===========================
+// PLANNER
+// ===========================
+function renderPlanner() {
+  renderPlanFilters();
+  renderAllPosts();
+}
+function renderPlanFilters() {
+  const data = getData();
+  const channels = data.channels || [];
+  let html = `<button class="filter-chip ${planPlatformFilter==='all'?'active':''}" onclick="setPlatFilter('all',this)">Barchasi</button>
+    <button class="filter-chip ${planPlatformFilter==='telegram'?'active':''}" onclick="setPlatFilter('telegram',this)">✈️ Telegram</button>
+    <button class="filter-chip ${planPlatformFilter==='instagram'?'active':''}" onclick="setPlatFilter('instagram',this)">📸 Instagram</button>`;
+  channels.forEach(ch => {
+    html += `<button class="filter-chip ${planPlatformFilter===ch.id?'active':''}" onclick="setPlatFilter('${ch.id}',this)">${ch.platform==='telegram'?'✈️':'📸'} ${ch.name}</button>`;
+  });
+  document.getElementById('planFilters').innerHTML = html;
+}
+function setPlatFilter(v, el) {
+  planPlatformFilter = v;
+  document.querySelectorAll('#planFilters .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderAllPosts();
+}
+function setPlanTab(t, el) {
+  planFilter = t;
+  document.querySelectorAll('#page-planner .tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderAllPosts();
+}
+function renderAllPosts() {
+  const data = getData();
+  let posts = data.posts || [];
+  if (planFilter !== 'all') posts = posts.filter(p => p.status === planFilter);
+  if (planPlatformFilter !== 'all') {
+    if (['telegram','instagram'].includes(planPlatformFilter)) {
+      posts = posts.filter(p => p.platform === planPlatformFilter);
+    } else {
+      posts = posts.filter(p => p.channelId === planPlatformFilter);
+    }
+  }
+  posts.sort((a,b) => new Date(a.date)-new Date(b.date));
+  const container = document.getElementById('allPosts');
+  if (!posts.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Postlar topilmadi</p><span>Filterni o'zgartiring yoki yangi post qo'shing</span></div>`;
+  } else {
+    container.innerHTML = posts.map((p,i) => postCardHTML(p, i*0.03)).join('');
+  }
+}
+
+// ===========================
+// PLATFORM POSTS
+// ===========================
+function renderPlatformPosts(platform) {
+  const data = getData();
+  const posts = (data.posts||[]).filter(p=>p.platform===platform).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const containerId = platform==='telegram'?'telegramPosts':'instagramPosts';
+  const container = document.getElementById(containerId);
+  if (!posts.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">${platform==='telegram'?'✈️':'📸'}</div><p>Hali postlar yo'q</p><span>+ Post qo'shish tugmasini bosing</span></div>`;
+  } else {
+    container.innerHTML = posts.map((p,i) => postCardHTML(p, i*0.04)).join('');
+  }
+}
+
+// ===========================
+// SCENARIOS
+// ===========================
+function renderScenarios() {
+  const data = getData();
+  const posts = (data.posts||[]).filter(p=>p.scenario && p.scenario.trim()).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const container = document.getElementById('scenariosList');
+  if (!posts.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">✍️</div><p>Ssenariy yozilmagan</p><span>Postlarga matn qo'shib ssenariylarni ko'ring</span></div>`;
+    return;
+  }
+  container.innerHTML = posts.map((p,i) => {
+    const d = new Date(p.date);
+    const dateStr = d.toLocaleDateString('uz-UZ',{day:'2-digit',month:'short',year:'numeric'});
+    const data2 = getData();
+    const channel = (data2.channels||[]).find(c=>c.id===p.channelId);
+    return `
+      <div class="post-card" style="animation-delay:${i*0.04}s;flex-direction:column;cursor:default">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div class="post-platform ${p.platform==='telegram'?'tg':'ig'}">${p.platform==='telegram'?'✈️':'📸'}</div>
+          <div style="flex:1">
+            <div class="post-title">${p.title||'Sarlavsiz'}</div>
+            <div class="post-meta"><span>📅 ${dateStr}</span><span>${channel?channel.name:''}</span></div>
+          </div>
+          <div class="edit-only" style="display:flex;gap:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="editPost('${p.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}')">🗑</button>
+          </div>
+        </div>
+        <div class="scenario-panel">
+          <div class="scenario-title">📄 Ssenariy</div>
+          <div class="scenario-text">${escapeHtml(p.scenario)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===========================
+// CALENDAR
+// ===========================
+function setCalView(v, el) {
+  calView = v;
+  document.querySelectorAll('#page-calendar .tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderCalendar();
+}
+function changeMonth(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth=0; currentYear++; }
+  if (currentMonth < 0) { currentMonth=11; currentYear--; }
+  renderCalendar();
+}
+function renderCalendar() {
+  const months = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+  document.getElementById('calMonthLabel').textContent = `${months[currentMonth]} ${currentYear}`;
+  if (calView === 'month') renderMonthView();
+  else renderWeekView();
+}
+function renderMonthView() {
+  const data = getData();
+  const posts = data.posts || [];
+  const days = ['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const lastDay = new Date(currentYear, currentMonth+1, 0);
+  let startDow = firstDay.getDay(); if (startDow===0) startDow=7; startDow--;
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let html = `<div class="calendar-grid">`;
+  days.forEach(d => html += `<div class="cal-header">${d}</div>`);
+
+  // prev month days
+  for (let i=0; i<startDow; i++) {
+    const dd = new Date(currentYear, currentMonth, -startDow+i+1);
+    html += `<div class="cal-day other-month"><div class="cal-num">${dd.getDate()}</div></div>`;
+  }
+
+  for (let d=1; d<=lastDay.getDate(); d++) {
+    const date = new Date(currentYear, currentMonth, d);
+    const isToday = date.getTime()===today.getTime();
+    const dayPosts = posts.filter(p => {
+      const pd = new Date(p.date); pd.setHours(0,0,0,0);
+      return pd.getTime()===date.getTime();
+    });
+    html += `<div class="cal-day${isToday?' today':''}" onclick="calDayClick('${date.toISOString().slice(0,10)}')">
+      <div class="cal-num" style="${isToday?'color:var(--blue3);font-weight:800':''}">${d}</div>
+      ${dayPosts.slice(0,3).map(p=>`<div class="cal-dot ${p.platform==='telegram'?'tg':'ig'}">${p.platform==='telegram'?'✈':'📸'} ${(p.title||'Post').slice(0,10)}</div>`).join('')}
+      ${dayPosts.length>3?`<div style="font-size:10px;color:var(--gray3);padding:2px 4px">+${dayPosts.length-3} ko'proq</div>`:''}
+    </div>`;
+  }
+
+  const remaining = 7 - ((startDow + lastDay.getDate()) % 7);
+  if (remaining < 7) {
+    for (let i=1; i<=remaining; i++) {
+      html += `<div class="cal-day other-month"><div class="cal-num">${i}</div></div>`;
+    }
+  }
+  html += '</div>';
+  document.getElementById('calendarView').innerHTML = html;
+}
+function renderWeekView() {
+  const data = getData();
+  const posts = data.posts || [];
+  const today = new Date();
+  const dow = today.getDay(); const diff = today.getDate() - (dow===0?6:dow-1);
+  const weekStart = new Date(today.setDate(diff));
+  const days = ['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+  const hours = [9,10,11,12,13,14,15,16,17,18,19,20];
+
+  let html = `<div class="week-grid">`;
+  html += `<div class="week-header"></div>`;
+  for (let i=0; i<7; i++) {
+    const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
+    html += `<div class="week-header">${days[i]}<br><span style="font-size:16px;font-weight:800">${d.getDate()}</span></div>`;
+  }
+  hours.forEach(h => {
+    html += `<div class="week-time">${h}:00</div>`;
+    for (let i=0; i<7; i++) {
+      const d = new Date(weekStart); d.setDate(weekStart.getDate()+i);
+      const dayPosts = posts.filter(p => {
+        const pd = new Date(p.date);
+        return pd.getDate()===d.getDate() && pd.getMonth()===d.getMonth() && pd.getFullYear()===d.getFullYear() && pd.getHours()===h;
+      });
+      html += `<div class="week-cell">
+        ${dayPosts.map(p=>`<div class="cal-dot ${p.platform==='telegram'?'tg':'ig'}" onclick="viewPost('${p.id}')" style="margin-bottom:3px;cursor:pointer">${p.platform==='telegram'?'✈':'📸'} ${(p.title||'Post').slice(0,8)}</div>`).join('')}
+      </div>`;
+    }
+  });
+  html += '</div>';
+  document.getElementById('calendarView').innerHTML = html;
+}
+function calDayClick(dateStr) {
+  if (isReadOnly) return;
+  const d = document.getElementById('postDate');
+  if (d) d.value = dateStr + 'T09:00';
+  openAddPost();
+}
+
+// ===========================
+// CHANNELS
+// ===========================
+const CHANNEL_COLORS = ['#2272ff','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#f97316'];
+let selectedColor = CHANNEL_COLORS[0];
+
+function renderChannels() {
+  const data = getData();
+  const channels = data.channels || [];
+  const posts = data.posts || [];
+  const grid = document.getElementById('channelsGrid');
+  if (!channels.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">📡</div><p>Kanallar yo'q</p><span>+ Kanal qo'shish tugmasini bosing</span></div>`;
+    return;
+  }
+  grid.innerHTML = channels.map((ch,i) => {
+    const chPosts = posts.filter(p=>p.channelId===ch.id);
+    const planned = chPosts.filter(p=>p.status==='planned').length;
+    const published = chPosts.filter(p=>p.status==='published').length;
+    return `
+      <div class="channel-card" style="animation-delay:${i*0.06}s;border-color:${ch.color||'var(--blue2)'}44;border-left:4px solid ${ch.color||'var(--blue2)'}">
+        <div class="channel-header">
+          <div class="channel-icon ${ch.platform}" style="background:${ch.color||'var(--blue2)'}25;color:${ch.color||'var(--blue2)'}">
+            ${ch.platform==='telegram'?'✈️':'📸'}
+          </div>
+          <div>
+            <div class="channel-name">${ch.name}</div>
+            <div class="channel-platform">${ch.platform==='telegram'?'Telegram':'Instagram'} ${ch.username||''}</div>
+          </div>
+        </div>
+        <div class="channel-stats">
+          <div class="channel-stat-mini" style="border-bottom:2px solid ${ch.color||'var(--blue2)'}44">
+            <div class="num" style="color:${ch.color||'var(--blue3)'}">${chPosts.length}</div>
+            <div class="lbl">Jami post</div>
+          </div>
+          <div class="channel-stat-mini" style="border-bottom:2px solid ${ch.color||'var(--blue2)'}44">
+            <div class="num">${planned}</div>
+            <div class="lbl">Rejalashtirilgan</div>
+          </div>
+          <div class="channel-stat-mini" style="border-bottom:2px solid ${ch.color||'var(--blue2)'}44">
+            <div class="num">${published}</div>
+            <div class="lbl">E'lon qilingan</div>
+          </div>
+        </div>
+        ${ch.desc ? `<div style="font-size:13px;color:var(--gray3);margin-bottom:12px">${ch.desc}</div>` : ''}
+        <div class="channel-actions edit-only">
+          <button class="btn btn-sm" style="flex:1;background:${ch.color||'var(--blue2)'}18;color:${ch.color||'var(--blue3)'};border:1px solid ${ch.color||'var(--blue2)'}33" onclick="editChannel('${ch.id}')">✏️ Tahrirlash</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteChannel('${ch.id}')">🗑</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===========================
+// ADD/EDIT POST
+// ===========================
+function openAddPost(platform) {
+  if (isReadOnly) return;
+  editingPostId = null;
+  document.getElementById('postModalTitle').textContent = 'Yangi post qo\'shish';
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postNote').value = '';
+  document.getElementById('postScenario').value = '';
+  document.getElementById('postStatus').value = 'planned';
+  document.getElementById('postContentType').value = 'post';
+  const now = new Date();
+  document.getElementById('postDate').value = now.toISOString().slice(0,16);
+  selectPlatform(platform || 'telegram');
+  document.getElementById('postModal').classList.add('open');
+}
+
+function editPost(id) {
+  if (isReadOnly) return;
+  const data = getData();
+  const p = (data.posts||[]).find(p=>p.id===id);
+  if (!p) return;
+  editingPostId = id;
+  document.getElementById('postModalTitle').textContent = 'Postni tahrirlash';
+  document.getElementById('postTitle').value = p.title||'';
+  document.getElementById('postNote').value = p.note||'';
+  document.getElementById('postScenario').value = p.scenario||'';
+  document.getElementById('postStatus').value = p.status||'planned';
+  document.getElementById('postContentType').value = p.contentType||'post';
+  document.getElementById('postDate').value = new Date(p.date).toISOString().slice(0,16);
+  selectPlatform(p.platform||'telegram');
+  setTimeout(() => {
+    document.getElementById('postChannel').value = p.channelId||'';
+  }, 50);
+  document.getElementById('postModal').classList.add('open');
+}
+
+function deletePost(id) {
+  if (isReadOnly) return;
+  if (!confirm('Bu postni o\'chirmoqchimisiz?')) return;
+  const data = getData();
+  data.posts = (data.posts||[]).filter(p=>p.id!==id);
+  saveData(data);
+  showToast('Post o\'chirildi');
+  renderPage(getCurrentPage());
+}
+
+function getCurrentPage() {
+  const active = document.querySelector('.page.active');
+  if (!active) return 'dashboard';
+  return active.id.replace('page-','');
+}
+
+function closePostModal() {
+  document.getElementById('postModal').classList.remove('open');
+  editingPostId = null;
+}
+
+function savePost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const date = document.getElementById('postDate').value;
+  const status = document.getElementById('postStatus').value;
+  const scenario = document.getElementById('postScenario').value.trim();
+  const note = document.getElementById('postNote').value.trim();
+  const channelId = document.getElementById('postChannel').value;
+  const contentType = document.getElementById('postContentType').value;
+
+  if (!date) { showToast('Sanani kiriting', 'error'); return; }
+
+  const data = getData();
+  if (!data.posts) data.posts = [];
+
+  if (editingPostId) {
+    const idx = data.posts.findIndex(p=>p.id===editingPostId);
+    if (idx > -1) {
+      data.posts[idx] = { ...data.posts[idx], title, date, status, scenario, note, channelId, platform: selectedPlatform, contentType };
+    }
+    showToast('Post yangilandi');
+  } else {
+    data.posts.push({ id: genId(), title, date, status, scenario, note, channelId, platform: selectedPlatform, contentType, createdAt: new Date().toISOString() });
+    showToast('Post qo\'shildi');
+  }
+  saveData(data);
+  closePostModal();
+  renderPage(getCurrentPage());
+}
+
+function selectPlatform(p) {
+  selectedPlatform = p;
+  const tgBtn = document.getElementById('platTg');
+  const igBtn = document.getElementById('platIg');
+  tgBtn.className = `btn ${p==='telegram'?'btn-primary':'btn-secondary'}`;
+  igBtn.className = `btn ${p==='instagram'?'btn-primary':'btn-secondary'}`;
+  updateChannelSelect();
+}
+
+function updateChannelSelect() {
+  const data = getData();
+  const channels = (data.channels||[]).filter(c=>c.platform===selectedPlatform);
+  const sel = document.getElementById('postChannel');
+  sel.innerHTML = `<option value="">— Kanal tanlang —</option>` + channels.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+// ===========================
+// VIEW POST
+// ===========================
+function viewPost(id) {
+  const data = getData();
+  const p = (data.posts||[]).find(p=>p.id===id);
+  if (!p) return;
+  const channel = (data.channels||[]).find(c=>c.id===p.channelId);
+  const d = new Date(p.date);
+  const statusLabel = {planned:'Rejalashtirilgan',published:"E'lon qilindi",draft:'Qoralama'};
+  const statusClass = {planned:'status-planned',published:'status-published',draft:'status-draft'};
+
+  document.getElementById('viewModalTitle').innerHTML = `${p.platform==='telegram'?'✈️':'📸'} ${p.title||'Sarlavsiz post'}`;
+  document.getElementById('viewModalBody').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <span class="post-status ${statusClass[p.status]||'status-draft'}">${statusLabel[p.status]||p.status}</span>
+      <span style="font-size:13px;color:var(--gray3)">📅 ${d.toLocaleDateString('uz-UZ',{day:'2-digit',month:'long',year:'numeric'})}</span>
+      <span style="font-size:13px;color:var(--gray3)">🕐 ${d.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'})}</span>
+      ${channel?`<span class="badge ${p.platform==='telegram'?'badge-tg':'badge-ig'}">${channel.name}</span>`:''}
+    </div>
+    ${p.note ? `<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--gray3);margin-bottom:14px"><strong>Izoh:</strong> ${escapeHtml(p.note)}</div>`:''}
+    ${p.scenario ? `<div class="scenario-panel"><div class="scenario-title">📄 Ssenariy / Matn</div><div class="scenario-text">${escapeHtml(p.scenario)}</div></div>`:'<div style="text-align:center;padding:24px;color:var(--gray3);font-size:14px">Ssenariy yozilmagan</div>'}
+  `;
+  document.getElementById('viewModalFooter').innerHTML = isReadOnly ? `<button class="btn btn-secondary" onclick="closeViewModal()">Yopish</button>` :
+    `<button class="btn btn-secondary" onclick="closeViewModal()">Yopish</button>
+     <button class="btn btn-secondary" onclick="closeViewModal();editPost('${id}')">✏️ Tahrirlash</button>
+     <button class="btn btn-danger" onclick="closeViewModal();deletePost('${id}')">🗑 O'chirish</button>`;
+  document.getElementById('viewModal').classList.add('open');
+}
+function closeViewModal() { document.getElementById('viewModal').classList.remove('open'); }
+
+// ===========================
+// CHANNELS CRUD
+// ===========================
+function openAddChannel() {
+  if (isReadOnly) return;
+  editingChannelId = null;
+  document.getElementById('channelModalTitle').textContent = 'Yangi kanal qo\'shish';
+  document.getElementById('channelName').value = '';
+  document.getElementById('channelUsername').value = '';
+  document.getElementById('channelDesc').value = '';
+  selectedColor = CHANNEL_COLORS[0];
+  selectChPlatform('telegram');
+  renderColorOptions();
+  document.getElementById('channelModal').classList.add('open');
+}
+function editChannel(id) {
+  if (isReadOnly) return;
+  const data = getData();
+  const ch = (data.channels||[]).find(c=>c.id===id);
+  if (!ch) return;
+  editingChannelId = id;
+  document.getElementById('channelModalTitle').textContent = 'Kanalni tahrirlash';
+  document.getElementById('channelName').value = ch.name||'';
+  document.getElementById('channelUsername').value = ch.username||'';
+  document.getElementById('channelDesc').value = ch.desc||'';
+  selectedColor = ch.color || CHANNEL_COLORS[0];
+  selectChPlatform(ch.platform||'telegram');
+  renderColorOptions();
+  document.getElementById('channelModal').classList.add('open');
+}
+function deleteChannel(id) {
+  if (isReadOnly) return;
+  if (!confirm('Bu kanalni o\'chirmoqchimisiz? Kanal postlari ham o\'chiriladi.')) return;
+  const data = getData();
+  data.channels = (data.channels||[]).filter(c=>c.id!==id);
+  data.posts = (data.posts||[]).filter(p=>p.channelId!==id);
+  saveData(data);
+  showToast('Kanal o\'chirildi');
+  renderChannels();
+}
+function closeChannelModal() {
+  document.getElementById('channelModal').classList.remove('open');
+  editingChannelId = null;
+}
+function saveChannel() {
+  const name = document.getElementById('channelName').value.trim();
+  if (!name) { showToast('Kanal nomini kiriting', 'error'); return; }
+  const data = getData();
+  if (!data.channels) data.channels = [];
+  const ch = {
+    name, username: document.getElementById('channelUsername').value.trim(),
+    desc: document.getElementById('channelDesc').value.trim(),
+    platform: selectedChPlatform, color: selectedColor
+  };
+  if (editingChannelId) {
+    const idx = data.channels.findIndex(c=>c.id===editingChannelId);
+    if (idx > -1) data.channels[idx] = { ...data.channels[idx], ...ch };
+    showToast('Kanal yangilandi');
+  } else {
+    data.channels.push({ id: genId(), ...ch, createdAt: new Date().toISOString() });
+    showToast('Kanal qo\'shildi');
+  }
+  saveData(data);
+  closeChannelModal();
+  renderChannels();
+}
+function selectChPlatform(p) {
+  selectedChPlatform = p;
+  document.getElementById('chPlatTg').className = `btn ${p==='telegram'?'btn-primary':'btn-secondary'}`;
+  document.getElementById('chPlatIg').className = `btn ${p==='instagram'?'btn-primary':'btn-secondary'}`;
+}
+function renderColorOptions() {
+  document.getElementById('colorOptions').innerHTML = CHANNEL_COLORS.map(c =>
+    `<div class="color-opt ${c===selectedColor?'selected':''}" style="background:${c}" onclick="selectColor('${c}')"></div>`
+  ).join('');
+}
+function selectColor(c) {
+  selectedColor = c;
+  renderColorOptions();
+}
+
+// ===========================
+// SHARE
+// ===========================
+function shareView() {
+  const url = window.location.href.split('?')[0] + '?view=readonly';
+  document.getElementById('shareLinkText').textContent = url;
+  document.getElementById('shareModal').classList.add('open');
+  // Sync share data
+  const data = getData();
+  localStorage.setItem(SHARE_KEY, JSON.stringify(data));
+}
+function copyShareLink() {
+  const url = document.getElementById('shareLinkText').textContent;
+  navigator.clipboard.writeText(url).then(() => showToast('Havola nusxalandi! 🔗')).catch(() => showToast('Nusxalanmadi', 'error'));
+}
+
+// ===========================
+// DATA EXPORT/IMPORT
+// ===========================
+function exportData() {
+  const data = getData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `smm-sam-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('Ma\'lumotlar eksport qilindi');
+}
+function importDataTrigger() { document.getElementById('importInput').click(); }
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      saveData(d);
+      showToast('Ma\'lumotlar import qilindi');
+      renderDashboard();
+    } catch { showToast('Fayl noto\'g\'ri', 'error'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+function clearAll() {
+  if (!confirm('Barcha ma\'lumotlarni o\'chirishni xohlaysizmi? Bu qaytarib bo\'lmaydi.')) return;
+  const theme = getData().theme;
+  saveData({ posts:[], channels:[], theme });
+  showToast('Barcha ma\'lumotlar tozalandi');
+  renderDashboard();
+}
+
+// ===========================
+// INIT
+// ===========================
+document.addEventListener('click', e => {
+  if (!e.target.closest('.dropdown')) {
+    document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
+  }
+  if (window.innerWidth <= 900 && !e.target.closest('.sidebar') && !e.target.closest('.sidebar-toggle')) {
+    closeSidebar();
+  }
+});
+
+window.addEventListener('storage', e => {
+  if (isReadOnly && (e.key === STORAGE_KEY || e.key === SHARE_KEY)) {
+    if (e.key === SHARE_KEY && e.newValue) {
+      localStorage.setItem(STORAGE_KEY, e.newValue);
+    }
+    renderPage(getCurrentPage());
+    renderDashboard();
+  }
+});
+
+// ===========================
+// STRATEGY BOARD
+// ===========================
+const STRAT_COLS = [
+  { id:'goals', label:'🎯 Maqsadlar', color:'#2272ff' },
+  { id:'audience', label:'👥 Auditoriya', color:'#22c55e' },
+  { id:'content', label:'📝 Content yo\'nalish', color:'#8b5cf6' },
+  { id:'kpi', label:'📊 KPI', color:'#f59e0b' },
+  { id:'ideas', label:'💡 G\'oyalar', color:'#06b6d4' },
+  { id:'risks', label:'⚠️ Risklar', color:'#ef4444' },
+];
+let editingStratCardId = null;
+
+function renderStrategy() {
+  const data = getData();
+  const meta = data.strategyMeta || {};
+  const cards = data.strategyCards || [];
+
+  // fill meta
+  ['stratPageName','stratGoal','stratPeriod','stratBudget','stratAudience'].forEach(id => {
+    const key = id.replace('strat','').charAt(0).toLowerCase() + id.replace('strat','').slice(1);
+    const el = document.getElementById(id);
+    if (el) el.value = meta[key] || '';
+  });
+
+  // board
+  const board = document.getElementById('strategyBoard');
+  board.innerHTML = STRAT_COLS.map(col => {
+    const colCards = cards.filter(c => c.col === col.id);
+    const priColors = {high:'#ef4444',mid:'#f59e0b',low:'#22c55e'};
+    return `
+      <div class="strategy-col">
+        <div class="strategy-col-header">
+          <span><span class="strategy-col-dot" style="background:${col.color}"></span>${col.label}</span>
+          <span style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:10px;font-size:11px">${colCards.length}</span>
+        </div>
+        ${colCards.map(card => `
+          <div class="strategy-card">
+            <div class="card-tag" style="background:${priColors[card.priority]||'#2272ff'}22;color:${priColors[card.priority]||'#2272ff'}">${card.priority==='high'?'🔴 Muhim':card.priority==='mid'?'🟡 O\'rta':'🟢 Past'}</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">${escapeHtml(card.title||'')}</div>
+            ${card.desc ? `<div style="font-size:12px;color:var(--gray3);line-height:1.5">${escapeHtml(card.desc)}</div>` : ''}
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="editStratCard('${card.id}');event.stopPropagation()">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteStratCard('${card.id}');event.stopPropagation()">🗑</button>
+            </div>
+          </div>
+        `).join('')}
+        <button class="add-card-btn" onclick="addStrategyCard('${col.id}')">+ Karta qo'shish</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function saveStrategyMeta() {
+  const data = getData();
+  data.strategyMeta = {
+    pageName: document.getElementById('stratPageName').value,
+    goal: document.getElementById('stratGoal').value,
+    period: document.getElementById('stratPeriod').value,
+    budget: document.getElementById('stratBudget').value,
+    audience: document.getElementById('stratAudience').value,
+  };
+  saveData(data);
+}
+
+function addStrategyCard(colId) {
+  editingStratCardId = null;
+  document.getElementById('stratCardModalTitle').textContent = 'Yangi karta';
+  document.getElementById('stratCardTitle').value = '';
+  document.getElementById('stratCardDesc').value = '';
+  document.getElementById('stratCardPriority').value = 'high';
+  if (colId) document.getElementById('stratCardCol').value = colId;
+  document.getElementById('stratCardModal').classList.add('open');
+}
+function editStratCard(id) {
+  const data = getData();
+  const card = (data.strategyCards||[]).find(c=>c.id===id);
+  if (!card) return;
+  editingStratCardId = id;
+  document.getElementById('stratCardModalTitle').textContent = 'Kartani tahrirlash';
+  document.getElementById('stratCardCol').value = card.col||'goals';
+  document.getElementById('stratCardTitle').value = card.title||'';
+  document.getElementById('stratCardDesc').value = card.desc||'';
+  document.getElementById('stratCardPriority').value = card.priority||'high';
+  document.getElementById('stratCardModal').classList.add('open');
+}
+function deleteStratCard(id) {
+  if (!confirm('Bu kartani o\'chirmoqchimisiz?')) return;
+  const data = getData();
+  data.strategyCards = (data.strategyCards||[]).filter(c=>c.id!==id);
+  saveData(data);
+  renderStrategy();
+}
+function closeStratCardModal() {
+  document.getElementById('stratCardModal').classList.remove('open');
+  editingStratCardId = null;
+}
+function saveStratCard() {
+  const title = document.getElementById('stratCardTitle').value.trim();
+  if (!title) { showToast('Sarlavha kiriting', 'error'); return; }
+  const data = getData();
+  if (!data.strategyCards) data.strategyCards = [];
+  const card = {
+    col: document.getElementById('stratCardCol').value,
+    title,
+    desc: document.getElementById('stratCardDesc').value.trim(),
+    priority: document.getElementById('stratCardPriority').value,
+  };
+  if (editingStratCardId) {
+    const idx = data.strategyCards.findIndex(c=>c.id===editingStratCardId);
+    if (idx>-1) data.strategyCards[idx] = {...data.strategyCards[idx], ...card};
+    showToast('Karta yangilandi');
+  } else {
+    data.strategyCards.push({id:genId(), ...card, createdAt:new Date().toISOString()});
+    showToast('Karta qo\'shildi');
+  }
+  saveData(data);
+  closeStratCardModal();
+  renderStrategy();
+}
+
+function openMindmap() {
+  document.getElementById('mindmapModal').classList.add('open');
+  setTimeout(drawMindmap, 100);
+}
+function drawMindmap() {
+  const canvas = document.getElementById('mindmapCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const data = getData();
+  const cards = data.strategyCards || [];
+  const meta = data.strategyMeta || {};
+  const W = canvas.width, H = canvas.height;
+  const isDark = !document.documentElement.getAttribute('data-theme');
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = isDark ? '#162b52' : '#f0f4ff';
+  ctx.fillRect(0,0,W,H);
+
+  // center node
+  const cx = W/2, cy = H/2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 42, 0, Math.PI*2);
+  ctx.fillStyle = '#2272ff';
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 12px Plus Jakarta Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(meta.pageName || 'Strategiya', cx, cy-4);
+  ctx.font = '10px Plus Jakarta Sans, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.fillText(meta.goal || '', cx, cy+10);
+
+  // branches
+  STRAT_COLS.forEach((col, i) => {
+    const angle = (i / STRAT_COLS.length) * Math.PI * 2 - Math.PI/2;
+    const bx = cx + Math.cos(angle)*170;
+    const by = cy + Math.sin(angle)*130;
+    // line
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle)*42, cy + Math.sin(angle)*42);
+    ctx.lineTo(bx, by);
+    ctx.strokeStyle = col.color + '66';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // node
+    ctx.beginPath();
+    ctx.arc(bx, by, 28, 0, Math.PI*2);
+    ctx.fillStyle = col.color + '33';
+    ctx.fill();
+    ctx.strokeStyle = col.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = isDark ? '#fff' : '#0a1628';
+    ctx.font = 'bold 10px Plus Jakarta Sans, sans-serif';
+    ctx.textAlign = 'center';
+    const label = col.label.replace(/[^\w\s']/g,'').trim().slice(0,12);
+    ctx.fillText(label, bx, by+4);
+    // count
+    const cnt = cards.filter(c=>c.col===col.id).length;
+    if (cnt>0) {
+      ctx.fillStyle = col.color;
+      ctx.font = 'bold 9px Plus Jakarta Sans, sans-serif';
+      ctx.fillText(cnt + ' ta', bx, by+16);
+    }
+  });
+}
+function downloadMindmap() {
+  drawMindmap();
+  const canvas = document.getElementById('mindmapCanvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'smm-strategiya-diagram.png';
+  a.click();
+}
+
+// ===========================
+// TEAM
+// ===========================
+const ROLE_ICONS = {mobilograf:'📱',smm:'💻',operator:'🎥',montaj:'✂️',dizayner:'🎨',copywriter:'✍️',other:'👤'};
+const ROLE_LABELS = {mobilograf:'Mobilograf',smm:'SMM mutaxassis',operator:'Operator',montaj:'Montaj ustasi',dizayner:'Dizayner',copywriter:'Copywriter',other:'Boshqa'};
+let editingMemberId = null;
+let currentPhotoData = null;
+
+function renderTeam() {
+  const data = getData();
+  const members = data.team || [];
+  const logs = data.dailyLogs || [];
+  const grid = document.getElementById('teamGrid');
+  if (!members.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">👥</div><p>Xodimlar yo'q</p><span>+ Xodim qo'shish tugmasini bosing</span></div>`;
+    return;
+  }
+  const now = new Date();
+  // Hafta: so'nggi 7 kun (bugun ham kiradi)
+  const weekAgo = new Date(now); weekAgo.setDate(now.getDate()-6); weekAgo.setHours(0,0,0,0);
+  // Oy: shu oyning 1-kuni
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const colors = ['#2272ff','#22c55e','#8b5cf6','#f59e0b','#ef4444','#06b6d4'];
+
+  grid.innerHTML = members.map((m, i) => {
+    const memberLogs = logs.filter(l => l.memberId === m.id);
+
+    // Haftalik: so'nggi 7 kun
+    const weekLogs = memberLogs.filter(l => {
+      const d = new Date(l.date); d.setHours(0,0,0,0);
+      return d >= weekAgo;
+    });
+    const weekReels   = weekLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+    const weekStories = weekLogs.reduce((s,l)=>s+(l.stories||0),0);
+
+    // Oylik: shu oyning boshi
+    const monthLogs = memberLogs.filter(l => {
+      const d = new Date(l.date); d.setHours(0,0,0,0);
+      return d >= monthStart;
+    });
+    const monthReels   = monthLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+    const monthStories = monthLogs.reduce((s,l)=>s+(l.stories||0),0);
+
+    // Plan
+    const reelsPlan  = m.monthlyTarget || 0;
+    const storyPlan  = m.monthlyStoryTarget || 0;
+    const reelsPct   = reelsPlan > 0 ? Math.min(100, Math.round(monthReels/reelsPlan*100)) : 0;
+    const storyPct   = storyPlan > 0 ? Math.min(100, Math.round(monthStories/storyPlan*100)) : 0;
+
+    const avatarHtml = m.photo
+      ? `<img src="${m.photo}" style="width:56px;height:56px;object-fit:cover;border-radius:16px;margin:0 auto 12px;display:block">`
+      : `<div class="team-avatar" style="background:${colors[i%6]}22;font-size:24px">${ROLE_ICONS[m.role]||'👤'}</div>`;
+
+    return `
+      <div class="team-card" style="animation-delay:${i*0.06}s">
+        ${avatarHtml}
+        <div class="team-name">${escapeHtml(m.name)}</div>
+        <div class="team-role">${ROLE_LABELS[m.role]||m.role}</div>
+        ${m.contact ? `<div style="font-size:12px;color:var(--blue3);margin-bottom:8px">${escapeHtml(m.contact)}</div>` : ''}
+
+        <!-- Haftalik va Oylik statistika -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;font-size:11px">
+          <div style="background:rgba(225,48,108,0.1);border-radius:7px;padding:7px;text-align:center">
+            <div style="font-weight:800;font-size:17px;color:#f077a4">${weekReels}</div>
+            <div style="color:var(--gray3);margin-top:1px">Hafta reels</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.1);border-radius:7px;padding:7px;text-align:center">
+            <div style="font-weight:800;font-size:17px;color:var(--warn)">${weekStories}</div>
+            <div style="color:var(--gray3);margin-top:1px">Hafta story</div>
+          </div>
+          <div style="background:rgba(225,48,108,0.07);border-radius:7px;padding:7px;text-align:center">
+            <div style="font-weight:800;font-size:17px;color:#f077a4">${monthReels}</div>
+            <div style="color:var(--gray3);margin-top:1px">Oy reels</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.07);border-radius:7px;padding:7px;text-align:center">
+            <div style="font-weight:800;font-size:17px;color:var(--warn)">${monthStories}</div>
+            <div style="color:var(--gray3);margin-top:1px">Oy story</div>
+          </div>
+        </div>
+
+        <!-- Plan progress -->
+        ${reelsPlan > 0 ? `
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray3);margin-bottom:3px">
+            <span>🎬 Reels rejasi</span>
+            <span style="font-weight:700;color:${reelsPct>=100?'var(--success)':'#f077a4'}">${monthReels}/${reelsPlan} (${reelsPct}%)</span>
+          </div>
+          <div class="week-bar-track">
+            <div class="week-bar-fill" style="width:${reelsPct}%;background:${reelsPct>=100?'var(--success)':'#E1306C'}"></div>
+          </div>
+        </div>` : ''}
+        ${storyPlan > 0 ? `
+        <div style="margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray3);margin-bottom:3px">
+            <span>📱 Story rejasi</span>
+            <span style="font-weight:700;color:${storyPct>=100?'var(--success)':'var(--warn)'}">${monthStories}/${storyPlan} (${storyPct}%)</span>
+          </div>
+          <div class="week-bar-track">
+            <div class="week-bar-fill" style="width:${storyPct}%;background:${storyPct>=100?'var(--success)':'#f59e0b'}"></div>
+          </div>
+        </div>` : ''}
+
+        ${m.note ? `<div style="font-size:12px;color:var(--gray3);margin-top:4px;text-align:left">${escapeHtml(m.note)}</div>` : ''}
+        <div style="display:flex;gap:6px;margin-top:14px">
+          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="editMember('${m.id}')">✏️ Tahrirlash</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">🗑</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAddMember() {
+  editingMemberId = null;
+  currentPhotoData = null;
+  document.getElementById('memberModalTitle').textContent = 'Yangi xodim';
+  ['memberName','memberContact','memberNote'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('memberRole').value = 'mobilograf';
+  document.getElementById('memberMonthlyTarget').value = '';
+  document.getElementById('memberMonthlyStoryTarget').value = '';
+  document.getElementById('photoPreview').innerHTML = '👤';
+  document.getElementById('photoPreview').style.fontSize = '48px';
+  document.getElementById('memberModal').classList.add('open');
+}
+function editMember(id) {
+  const data = getData();
+  const m = (data.team||[]).find(x=>x.id===id);
+  if (!m) return;
+  editingMemberId = id;
+  currentPhotoData = m.photo || null;
+  document.getElementById('memberModalTitle').textContent = 'Xodimni tahrirlash';
+  document.getElementById('memberName').value = m.name||'';
+  document.getElementById('memberRole').value = m.role||'mobilograf';
+  document.getElementById('memberContact').value = m.contact||'';
+  document.getElementById('memberMonthlyTarget').value = m.monthlyTarget||'';
+  document.getElementById('memberMonthlyStoryTarget').value = m.monthlyStoryTarget||'';
+  document.getElementById('memberNote').value = m.note||'';
+  // Photo preview
+  const prev = document.getElementById('photoPreview');
+  if (m.photo) {
+    prev.innerHTML = `<img src="${m.photo}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;margin-bottom:6px">`;
+    prev.style.fontSize = '';
+  } else {
+    prev.innerHTML = '👤';
+    prev.style.fontSize = '48px';
+  }
+  document.getElementById('memberModal').classList.add('open');
+}
+function deleteMember(id) {
+  if (!confirm('Bu xodimni o\'chirmoqchimisiz?\n\nXodimning barcha kunlik loglari (video/story hisoboti) ham o\'chiriladi!')) return;
+  const data = getData();
+  data.team = (data.team||[]).filter(m=>m.id!==id);
+  data.dailyLogs = (data.dailyLogs||[]).filter(l=>l.memberId!==id);
+  saveData(data);
+  showToast('Xodim va uning barcha hisoboti o\'chirildi');
+  // Barcha bog'liq sahifalarni yangilash
+  renderTeam();
+  renderDailyLogGrid();
+  renderSummary(currentSummaryTab || 'week');
+  renderDashboard();
+  if (typeof renderXulosa === 'function') renderXulosa(currentXulosTab || 'week');
+  if (typeof renderVideoStats === 'function') renderVideoStats();
+}
+function closeMemberModal() {
+  document.getElementById('memberModal').classList.remove('open');
+  editingMemberId = null;
+}
+function saveMember() {
+  const name = document.getElementById('memberName').value.trim();
+  if (!name) { showToast('Ism kiriting', 'error'); return; }
+  const data = getData();
+  if (!data.team) data.team = [];
+  const m = {
+    name,
+    role: document.getElementById('memberRole').value,
+    contact: document.getElementById('memberContact').value.trim(),
+    monthlyTarget: parseInt(document.getElementById('memberMonthlyTarget').value)||0,
+    monthlyStoryTarget: parseInt(document.getElementById('memberMonthlyStoryTarget').value)||0,
+    note: document.getElementById('memberNote').value.trim(),
+    photo: currentPhotoData || null,
+  };
+  if (editingMemberId) {
+    const idx = data.team.findIndex(x=>x.id===editingMemberId);
+    if (idx>-1) data.team[idx] = {...data.team[idx], ...m};
+    showToast('Xodim yangilandi');
+  } else {
+    data.team.push({id:genId(), ...m, createdAt:new Date().toISOString()});
+    showToast('Xodim qo\'shildi');
+  }
+  saveData(data);
+  closeMemberModal();
+  renderTeam();
+  renderDailyLogGrid();
+}
+
+// ===========================
+// VIDEO STATS
+// ===========================
+let videoTypeFilter = 'all';
+
+function setVideoTypeFilter(v, el) {
+  videoTypeFilter = v;
+  document.querySelectorAll('#page-videostats .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderVideoDetailList();
+}
+
+function renderVideoStats() {
+  const data = getData();
+  const posts = data.posts || [];
+
+  // populate month selector
+  const sel = document.getElementById('videoStatMonth');
+  const months = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+  const now = new Date();
+  if (!sel.options.length) {
+    for (let i=0;i<6;i++) {
+      let d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      const val = `${d.getFullYear()}-${d.getMonth()}`;
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = `${months[d.getMonth()]} ${d.getFullYear()}`;
+      if (i===0) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+  const [selYear, selMonth] = (sel.value||`${now.getFullYear()}-${now.getMonth()}`).split('-').map(Number);
+  const monthPosts = posts.filter(p => {
+    const d = new Date(p.date);
+    return d.getFullYear()===selYear && d.getMonth()===selMonth;
+  });
+
+  // summary
+  const reelsCount = monthPosts.filter(p=>p.contentType==='reels').length;
+  const storyCount = monthPosts.filter(p=>p.contentType==='story').length;
+  const videoCount = monthPosts.filter(p=>p.contentType==='video').length;
+  const postCount = monthPosts.filter(p=>!p.contentType||p.contentType==='post').length;
+  const total = monthPosts.length;
+
+  document.getElementById('videoSummary').innerHTML = `
+    <div class="video-stat-box reels"><div class="v-num" style="color:#f077a4">${reelsCount}</div><div class="v-lbl">🎬 Reels</div></div>
+    <div class="video-stat-box story"><div class="v-num" style="color:var(--warn)">${storyCount}</div><div class="v-lbl">📱 Story</div></div>
+    <div class="video-stat-box video"><div class="v-num" style="color:var(--blue3)">${videoCount}</div><div class="v-lbl">🎥 Video</div></div>
+    <div class="video-stat-box total"><div class="v-num" style="color:var(--success)">${postCount}</div><div class="v-lbl">📝 Post</div></div>
+    <div class="video-stat-box total" style="border-color:rgba(255,255,255,0.1)"><div class="v-num">${total}</div><div class="v-lbl">📦 Jami</div></div>
+  `;
+
+  // Weekly breakdown
+  const firstDay = new Date(selYear, selMonth, 1);
+  const lastDay = new Date(selYear, selMonth+1, 0);
+  let weeklyHtml = '';
+  let weekNum = 1;
+  let cur = new Date(firstDay);
+  while (cur <= lastDay) {
+    const wStart = new Date(cur);
+    const wEnd = new Date(cur); wEnd.setDate(wEnd.getDate()+6);
+    if (wEnd > lastDay) wEnd.setTime(lastDay.getTime());
+    const wPosts = monthPosts.filter(p => {
+      const d = new Date(p.date);
+      return d >= wStart && d <= wEnd;
+    });
+    const wReels = wPosts.filter(p=>p.contentType==='reels').length;
+    const wStory = wPosts.filter(p=>p.contentType==='story').length;
+    const wVideo = wPosts.filter(p=>p.contentType==='video').length;
+    const wPost = wPosts.filter(p=>!p.contentType||p.contentType==='post').length;
+    const maxV = Math.max(total/4, wPosts.length, 1);
+    weeklyHtml += `
+      <div class="week-report" style="padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700">${weekNum}-hafta &nbsp;<span style="font-size:11px;color:var(--gray3)">${wStart.getDate()}-${wEnd.getDate()} ${months[selMonth]}</span></div>
+          <div style="font-size:13px;font-weight:700">${wPosts.length} ta</div>
+        </div>
+        <div class="week-bar-row"><div class="week-bar-label">🎬 Reels</div><div class="week-bar-track"><div class="week-bar-fill" style="width:${(wReels/maxV)*100}%;background:#E1306C"></div></div><div class="week-bar-val">${wReels}</div></div>
+        <div class="week-bar-row"><div class="week-bar-label">📱 Story</div><div class="week-bar-track"><div class="week-bar-fill" style="width:${(wStory/maxV)*100}%;background:#f59e0b"></div></div><div class="week-bar-val">${wStory}</div></div>
+        <div class="week-bar-row"><div class="week-bar-label">🎥 Video</div><div class="week-bar-track"><div class="week-bar-fill" style="width:${(wVideo/maxV)*100}%;background:#2272ff"></div></div><div class="week-bar-val">${wVideo}</div></div>
+        <div class="week-bar-row"><div class="week-bar-label">📝 Post</div><div class="week-bar-track"><div class="week-bar-fill" style="width:${(wPost/maxV)*100}%;background:#8b5cf6"></div></div><div class="week-bar-val">${wPost}</div></div>
+      </div>
+    `;
+    cur.setDate(cur.getDate()+7);
+    weekNum++;
+  }
+  document.getElementById('weeklyBreakdown').innerHTML = weeklyHtml || '<div style="color:var(--gray3);font-size:14px;text-align:center;padding:20px">Bu oyda postlar yo\'q</div>';
+
+  // content type chart (simple bar)
+  const maxBar = Math.max(reelsCount, storyCount, videoCount, postCount, 1);
+  document.getElementById('contentTypeChart').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:20px;height:120px;padding:0 10px">
+      ${[
+        {l:'Reels',v:reelsCount,c:'#E1306C'},
+        {l:'Story',v:storyCount,c:'#f59e0b'},
+        {l:'Video',v:videoCount,c:'#2272ff'},
+        {l:'Post',v:postCount,c:'#8b5cf6'},
+      ].map(item => `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div style="font-size:12px;font-weight:700">${item.v}</div>
+          <div style="width:100%;border-radius:6px 6px 0 0;background:${item.c};height:${Math.round((item.v/maxBar)*80)}px;min-height:${item.v>0?4:0}px;transition:height 0.5s ease"></div>
+          <div style="font-size:11px;color:var(--gray3)">${item.l}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  renderVideoDetailList(monthPosts);
+}
+
+function renderVideoDetailList(monthPostsArg) {
+  const data = getData();
+  const sel = document.getElementById('videoStatMonth');
+  const now = new Date();
+  const [selYear, selMonth] = (sel.value||`${now.getFullYear()}-${now.getMonth()}`).split('-').map(Number);
+  let posts = monthPostsArg || (data.posts||[]).filter(p => {
+    const d = new Date(p.date);
+    return d.getFullYear()===selYear && d.getMonth()===selMonth;
+  });
+  if (videoTypeFilter !== 'all') {
+    if (videoTypeFilter === 'post') posts = posts.filter(p=>!p.contentType||p.contentType==='post');
+    else posts = posts.filter(p=>p.contentType===videoTypeFilter);
+  }
+  posts = posts.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const container = document.getElementById('videoDetailList');
+  if (!posts.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">🎬</div><p>Bu turda postlar yo'q</p></div>`;
+    return;
+  }
+  container.innerHTML = posts.map((p,i) => postCardHTML(p, i*0.03)).join('');
+}
+
+// ===========================
+// ANALYSIS
+// ===========================
+let editingAnalysisId = null;
+let editingNoteId = null;
+let selectedAPlat = 'instagram';
+let analysisTab = 'accounts';
+
+const PLAT_META = {
+  instagram: { icon:'📸', label:'Instagram', color:'#E1306C' },
+  telegram:  { icon:'✈️', label:'Telegram',  color:'#229ED9' },
+  youtube:   { icon:'▶️', label:'YouTube',   color:'#ef4444' },
+  tiktok:    { icon:'🎵', label:'TikTok',    color:'#010101' },
+  facebook:  { icon:'📘', label:'Facebook',  color:'#1877F2' },
+};
+
+function setAnalysisTab(tab, el) {
+  analysisTab = tab;
+  document.querySelectorAll('#page-analysis .tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  ['accounts','compare','notes'].forEach(t => {
+    const el2 = document.getElementById('analysisTab-' + t);
+    if (el2) el2.style.display = t === tab ? '' : 'none';
+  });
+  if (tab === 'compare') renderCompareTable();
+  if (tab === 'notes') renderAnalysisNotes();
+}
+
+function renderAnalysis() {
+  const data = getData();
+  const accounts = data.analysisAccounts || [];
+  const grid = document.getElementById('analysisGrid');
+  if (!accounts.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><p>Tahlil qilingan hisoblar yo'q</p><span>+ Tahlil qo'shish tugmasini bosing</span></div>`;
+    return;
+  }
+  grid.innerHTML = accounts.map((a,i) => {
+    const pm = PLAT_META[a.platform] || {icon:'📱',label:a.platform,color:'#2272ff'};
+    const scores = [
+      {l:'Content',v:a.scoreContent||0},
+      {l:'Dizayn',v:a.scoreDesign||0},
+      {l:'Faollik',v:a.scoreActivity||0},
+      {l:'Auditoriya',v:a.scoreAudience||0},
+    ];
+    const swotS = (a.swotS||'').split('\n').filter(x=>x.trim());
+    const swotW = (a.swotW||'').split('\n').filter(x=>x.trim());
+    const swotO = (a.swotO||'').split('\n').filter(x=>x.trim());
+    const swotT = (a.swotT||'').split('\n').filter(x=>x.trim());
+    const totalScore = scores.filter(s=>s.v>0);
+    const avgScore = totalScore.length ? (totalScore.reduce((s,x)=>s+x.v,0)/totalScore.length).toFixed(1) : '—';
+    const dateStr = a.date ? new Date(a.date).toLocaleDateString('uz-UZ',{day:'2-digit',month:'short',year:'numeric'}) : '';
+    return `
+      <div class="analysis-card" style="animation-delay:${i*0.07}s;border-top:3px solid ${pm.color}">
+        <div class="analysis-card-top">
+          <div class="analysis-avatar" style="background:${pm.color}18">${pm.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div class="analysis-account-name">${escapeHtml(a.name)}</div>
+            <div class="analysis-platform-tag">${pm.label} ${dateStr ? '• '+dateStr : ''}</div>
+            ${a.url ? `<a href="${escapeHtml(a.url)}" target="_blank" style="font-size:11px;color:${pm.color};text-decoration:none">${escapeHtml(a.url.replace(/https?:\/\//,'').slice(0,30))}</a>` : ''}
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:20px;font-weight:800;color:${pm.color}">${avgScore}</div>
+            <div style="font-size:10px;color:var(--gray3)">Ball</div>
+          </div>
+        </div>
+        <div class="analysis-metrics">
+          ${[
+            {l:'Obunachi', v: fmtNum(a.followers)},
+            {l:"Ko'rishlar", v: fmtNum(a.views)},
+            {l:'Postlar', v: fmtNum(a.posts)},
+          ].map(m=>`<div class="analysis-metric"><div class="am-val">${m.v||'—'}</div><div class="am-lbl">${m.l}</div></div>`).join('')}
+        </div>
+        <div class="analysis-card-body">
+          ${a.engagement ? `<div style="font-size:12px;color:var(--gray3);margin-bottom:10px">📊 Engagement: <strong style="color:var(--white)">${a.engagement}%</strong> &nbsp; 📅 Haftalik: <strong style="color:var(--white)">${a.weeklyPosts||0} post</strong></div>` : ''}
+          ${scores.some(s=>s.v>0) ? `
+            <div style="margin-bottom:12px">
+              ${scores.map(s=>`
+                <div class="analysis-score-bar">
+                  <div class="analysis-score-label">${s.l}</div>
+                  <div class="analysis-score-track"><div class="analysis-score-fill" style="width:${s.v*10}%;background:${pm.color}"></div></div>
+                  <div class="analysis-score-val" style="color:${pm.color}">${s.v||'—'}</div>
+                </div>
+              `).join('')}
+            </div>` : ''}
+          ${swotS.length||swotW.length||swotO.length||swotT.length ? `
+            <div class="swot-grid" style="gap:8px">
+              <div class="swot-cell s">
+                <div class="swot-title" style="color:#4ade80">💪 Kuchli</div>
+                ${swotS.slice(0,3).map(x=>`<div class="swot-item">${escapeHtml(x)}</div>`).join('')}
+              </div>
+              <div class="swot-cell w">
+                <div class="swot-title" style="color:#f87171">⚠️ Zaif</div>
+                ${swotW.slice(0,3).map(x=>`<div class="swot-item">${escapeHtml(x)}</div>`).join('')}
+              </div>
+              <div class="swot-cell o">
+                <div class="swot-title" style="color:var(--blue3)">🚀 Imkoniyat</div>
+                ${swotO.slice(0,3).map(x=>`<div class="swot-item">${escapeHtml(x)}</div>`).join('')}
+              </div>
+              <div class="swot-cell t">
+                <div class="swot-title" style="color:var(--warn)">🔴 Tahdid</div>
+                ${swotT.slice(0,3).map(x=>`<div class="swot-item">${escapeHtml(x)}</div>`).join('')}
+              </div>
+            </div>` : ''}
+          ${a.notes ? `<div style="font-size:12px;color:var(--gray3);margin-top:10px;line-height:1.5;border-top:1px solid rgba(255,255,255,0.06);padding-top:10px">${escapeHtml(a.notes)}</div>` : ''}
+          <div class="edit-only" style="display:flex;gap:6px;margin-top:12px">
+            <button class="btn btn-sm" style="flex:1;background:${pm.color}15;color:${pm.color};border:1px solid ${pm.color}30" onclick="editAnalysis('${a.id}')">✏️ Tahrirlash</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAnalysis('${a.id}')">🗑</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function fmtNum(n) {
+  if (!n) return '—';
+  n = Number(n);
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'K';
+  return n.toString();
+}
+
+function renderCompareTable() {
+  const data = getData();
+  const accounts = data.analysisAccounts || [];
+  const el = document.getElementById('compareTable');
+  if (!accounts.length) {
+    el.innerHTML = '<div style="color:var(--gray3);font-size:14px;text-align:center;padding:24px">Tahlil qilingan hisoblar yo\'q</div>';
+    return;
+  }
+  const headers = ['Hisob','Platform','Obunachi',"Ko'rishlar",'Postlar','Engagement','Haftalik','Ball'];
+  el.innerHTML = `
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr>${headers.map(h=>`<th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid rgba(255,255,255,0.07);white-space:nowrap">${h}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${accounts.map((a,i) => {
+            const pm = PLAT_META[a.platform]||{icon:'📱',color:'#2272ff'};
+            const scores=[a.scoreContent,a.scoreDesign,a.scoreActivity,a.scoreAudience].filter(x=>x>0);
+            const avg = scores.length ? (scores.reduce((s,x)=>s+x,0)/scores.length).toFixed(1) : '—';
+            return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+              <td style="padding:10px 12px;font-weight:600">${pm.icon} ${escapeHtml(a.name)}</td>
+              <td style="padding:10px 12px;color:${pm.color}">${pm.label||a.platform}</td>
+              <td style="padding:10px 12px">${fmtNum(a.followers)}</td>
+              <td style="padding:10px 12px">${fmtNum(a.views)}</td>
+              <td style="padding:10px 12px">${a.posts||'—'}</td>
+              <td style="padding:10px 12px">${a.engagement ? a.engagement+'%' : '—'}</td>
+              <td style="padding:10px 12px">${a.weeklyPosts||'—'}</td>
+              <td style="padding:10px 12px;font-weight:800;color:${pm.color}">${avg}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderAnalysisNotes() {
+  const data = getData();
+  const notes = data.analysisNotes || [];
+  const accounts = data.analysisAccounts || [];
+  const el = document.getElementById('analysisNotesList');
+  // populate note account select
+  const sel = document.getElementById('noteAccount');
+  if (sel) {
+    sel.innerHTML = `<option value="">— Hisob tanlang —</option>` + accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  }
+  if (!notes.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>Eslatmalar yo\'q</p><span>+ Eslatma tugmasini bosing</span></div>';
+    return;
+  }
+  const typeMap = {insight:{icon:'💡',cls:'ctype-post'},action:{icon:'✅',cls:'ctype-video'},trend:{icon:'📈',cls:'ctype-reels'},warning:{icon:'⚠️',cls:'ctype-story'}};
+  el.innerHTML = notes.map((n,i) => {
+    const t = typeMap[n.type]||{icon:'📝',cls:''};
+    const acc = accounts.find(a=>a.id===n.accountId);
+    return `
+      <div class="post-card" style="animation-delay:${i*0.04}s;cursor:default;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:20px">${t.icon}</span>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700">${escapeHtml(n.title)}</div>
+            <div style="font-size:11px;color:var(--gray3)">${new Date(n.createdAt||Date.now()).toLocaleDateString('uz-UZ')} ${acc?'• '+acc.name:''}</div>
+          </div>
+          <div class="edit-only" style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="editAnalysisNote('${n.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAnalysisNote('${n.id}')">🗑</button>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--gray2);line-height:1.6;white-space:pre-wrap">${escapeHtml(n.text)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAddAnalysis() {
+  if (isReadOnly) return;
+  editingAnalysisId = null;
+  document.getElementById('analysisModalTitle').textContent = 'Yangi tahlil';
+  ['aName','aUrl','aFollowers','aViews','aPosts','aEngagement','aWeeklyPosts','aNotes','aSwotS','aSwotW','aSwotO','aSwotT','aScoreContent','aScoreDesign','aScoreActivity','aScoreAudience'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('aDate').value = new Date().toISOString().slice(0,10);
+  selectAPlat('instagram');
+  document.getElementById('analysisModal').classList.add('open');
+}
+function editAnalysis(id) {
+  if (isReadOnly) return;
+  const data = getData();
+  const a = (data.analysisAccounts||[]).find(x=>x.id===id);
+  if (!a) return;
+  editingAnalysisId = id;
+  document.getElementById('analysisModalTitle').textContent = 'Tahlilni tahrirlash';
+  document.getElementById('aName').value = a.name||'';
+  document.getElementById('aUrl').value = a.url||'';
+  document.getElementById('aFollowers').value = a.followers||'';
+  document.getElementById('aViews').value = a.views||'';
+  document.getElementById('aPosts').value = a.posts||'';
+  document.getElementById('aEngagement').value = a.engagement||'';
+  document.getElementById('aWeeklyPosts').value = a.weeklyPosts||'';
+  document.getElementById('aNotes').value = a.notes||'';
+  document.getElementById('aSwotS').value = a.swotS||'';
+  document.getElementById('aSwotW').value = a.swotW||'';
+  document.getElementById('aSwotO').value = a.swotO||'';
+  document.getElementById('aSwotT').value = a.swotT||'';
+  document.getElementById('aScoreContent').value = a.scoreContent||'';
+  document.getElementById('aScoreDesign').value = a.scoreDesign||'';
+  document.getElementById('aScoreActivity').value = a.scoreActivity||'';
+  document.getElementById('aScoreAudience').value = a.scoreAudience||'';
+  document.getElementById('aDate').value = a.date||new Date().toISOString().slice(0,10);
+  selectAPlat(a.platform||'instagram');
+  document.getElementById('analysisModal').classList.add('open');
+}
+function deleteAnalysis(id) {
+  if (!confirm('Bu tahlilni o\'chirmoqchimisiz?')) return;
+  const data = getData();
+  data.analysisAccounts = (data.analysisAccounts||[]).filter(a=>a.id!==id);
+  saveData(data);
+  showToast('Tahlil o\'chirildi');
+  renderAnalysis();
+}
+function closeAnalysisModal() {
+  document.getElementById('analysisModal').classList.remove('open');
+  editingAnalysisId = null;
+}
+function selectAPlat(p) {
+  selectedAPlat = p;
+  ['instagram','telegram','youtube','tiktok','facebook'].forEach(pl => {
+    const btn = document.getElementById('aplat'+pl.charAt(0).toUpperCase()+pl.slice(1).slice(0,1).toUpperCase()+pl.slice(2));
+    const id = 'aplat' + {instagram:'Ig',telegram:'Tg',youtube:'Yt',tiktok:'Tt',facebook:'Fb'}[pl];
+    const el = document.getElementById(id);
+    if (el) el.className = `btn btn-sm ${p===pl?'btn-primary':'btn-secondary'}`;
+  });
+}
+function saveAnalysis() {
+  const name = document.getElementById('aName').value.trim();
+  if (!name) { showToast('Hisob nomini kiriting', 'error'); return; }
+  const data = getData();
+  if (!data.analysisAccounts) data.analysisAccounts = [];
+  const a = {
+    platform: selectedAPlat,
+    name,
+    url: document.getElementById('aUrl').value.trim(),
+    followers: parseFloat(document.getElementById('aFollowers').value)||0,
+    views: parseFloat(document.getElementById('aViews').value)||0,
+    posts: parseFloat(document.getElementById('aPosts').value)||0,
+    engagement: parseFloat(document.getElementById('aEngagement').value)||0,
+    weeklyPosts: parseFloat(document.getElementById('aWeeklyPosts').value)||0,
+    notes: document.getElementById('aNotes').value.trim(),
+    swotS: document.getElementById('aSwotS').value.trim(),
+    swotW: document.getElementById('aSwotW').value.trim(),
+    swotO: document.getElementById('aSwotO').value.trim(),
+    swotT: document.getElementById('aSwotT').value.trim(),
+    scoreContent: parseInt(document.getElementById('aScoreContent').value)||0,
+    scoreDesign: parseInt(document.getElementById('aScoreDesign').value)||0,
+    scoreActivity: parseInt(document.getElementById('aScoreActivity').value)||0,
+    scoreAudience: parseInt(document.getElementById('aScoreAudience').value)||0,
+    date: document.getElementById('aDate').value,
+  };
+  if (editingAnalysisId) {
+    const idx = data.analysisAccounts.findIndex(x=>x.id===editingAnalysisId);
+    if (idx>-1) data.analysisAccounts[idx] = {...data.analysisAccounts[idx], ...a};
+    showToast('Tahlil yangilandi');
+  } else {
+    data.analysisAccounts.push({id:genId(), ...a, createdAt:new Date().toISOString()});
+    showToast('Tahlil saqlandi');
+  }
+  saveData(data);
+  closeAnalysisModal();
+  renderAnalysis();
+}
+
+function addAnalysisNote() {
+  if (isReadOnly) return;
+  editingNoteId = null;
+  document.getElementById('noteModalTitle').textContent = 'Yangi eslatma';
+  document.getElementById('noteTitle').value = '';
+  document.getElementById('noteText').value = '';
+  document.getElementById('noteType').value = 'insight';
+  // populate account select
+  const data = getData();
+  const sel = document.getElementById('noteAccount');
+  sel.innerHTML = `<option value="">— Hisob tanlang —</option>` + (data.analysisAccounts||[]).map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  document.getElementById('analysisNoteModal').classList.add('open');
+}
+function editAnalysisNote(id) {
+  if (isReadOnly) return;
+  const data = getData();
+  const n = (data.analysisNotes||[]).find(x=>x.id===id);
+  if (!n) return;
+  editingNoteId = id;
+  document.getElementById('noteModalTitle').textContent = 'Eslatmani tahrirlash';
+  document.getElementById('noteTitle').value = n.title||'';
+  document.getElementById('noteText').value = n.text||'';
+  document.getElementById('noteType').value = n.type||'insight';
+  const sel = document.getElementById('noteAccount');
+  sel.innerHTML = `<option value="">— Hisob tanlang —</option>` + (data.analysisAccounts||[]).map(a=>`<option value="${a.id}" ${a.id===n.accountId?'selected':''}>${a.name}</option>`).join('');
+  document.getElementById('analysisNoteModal').classList.add('open');
+}
+function deleteAnalysisNote(id) {
+  if (!confirm('O\'chirilsinmi?')) return;
+  const data = getData();
+  data.analysisNotes = (data.analysisNotes||[]).filter(n=>n.id!==id);
+  saveData(data);
+  renderAnalysisNotes();
+}
+function closeNoteModal() {
+  document.getElementById('analysisNoteModal').classList.remove('open');
+  editingNoteId = null;
+}
+function saveAnalysisNote() {
+  const title = document.getElementById('noteTitle').value.trim();
+  const text = document.getElementById('noteText').value.trim();
+  if (!title) { showToast('Sarlavha kiriting', 'error'); return; }
+  const data = getData();
+  if (!data.analysisNotes) data.analysisNotes = [];
+  const n = {
+    title,
+    text,
+    type: document.getElementById('noteType').value,
+    accountId: document.getElementById('noteAccount').value,
+  };
+  if (editingNoteId) {
+    const idx = data.analysisNotes.findIndex(x=>x.id===editingNoteId);
+    if (idx>-1) data.analysisNotes[idx] = {...data.analysisNotes[idx], ...n};
+    showToast('Eslatma yangilandi');
+  } else {
+    data.analysisNotes.push({id:genId(), ...n, createdAt:new Date().toISOString()});
+    showToast('Eslatma saqlandi');
+  }
+  saveData(data);
+  closeNoteModal();
+  renderAnalysisNotes();
+}
+
+// ===========================
+// PHOTO UPLOAD
+// ===========================
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentPhotoData = ev.target.result;
+    const prev = document.getElementById('photoPreview');
+    prev.innerHTML = `<img src="${currentPhotoData}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;margin-bottom:6px">`;
+    prev.style.fontSize = '';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+// ===========================
+// DAILY LOG
+// ===========================
+function renderDailyLogGrid() {
+  const data = getData();
+  const members = data.team || [];
+  const grid = document.getElementById('dailyLogGrid');
+  if (!grid) return;
+
+  const logDateEl = document.getElementById('logDate');
+  if (logDateEl && !logDateEl.value) {
+    logDateEl.value = new Date().toISOString().slice(0,10);
+  }
+  const logDate = logDateEl ? logDateEl.value : new Date().toISOString().slice(0,10);
+
+  if (!members.length) {
+    grid.innerHTML = `<div style="color:var(--gray3);font-size:13px;padding:10px">Avval xodim qo'shing</div>`;
+    return;
+  }
+
+  const logs = data.dailyLogs || [];
+  const now = new Date();
+  const weekAgo = new Date(now); weekAgo.setDate(now.getDate()-6); weekAgo.setHours(0,0,0,0);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  grid.innerHTML = members.map(m => {
+    // Bugungi (tanlangan sana) kiritilgan qiymat
+    const existing = logs.find(l => l.memberId === m.id && l.date === logDate) || {};
+
+    // Haftalik jami (so'nggi 7 kun)
+    const weekLogs = logs.filter(l => {
+      if (l.memberId !== m.id) return false;
+      const d = new Date(l.date); d.setHours(0,0,0,0);
+      return d >= weekAgo;
+    });
+    const weekReels   = weekLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+    const weekStories = weekLogs.reduce((s,l)=>s+(l.stories||0),0);
+
+    // Oylik jami
+    const monthLogs = logs.filter(l => {
+      if (l.memberId !== m.id) return false;
+      const d = new Date(l.date); d.setHours(0,0,0,0);
+      return d >= monthStart;
+    });
+    const monthReels   = monthLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+    const monthStories = monthLogs.reduce((s,l)=>s+(l.stories||0),0);
+
+    const avatarHtml = m.photo
+      ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;">`
+      : (ROLE_ICONS[m.role]||'👤');
+
+    return `
+      <div class="daily-log-card">
+        <div class="dlc-header">
+          <div class="dlc-avatar" style="background:rgba(34,114,255,0.15)">${avatarHtml}</div>
+          <div>
+            <div class="dlc-name">${escapeHtml(m.name)}</div>
+            <div class="dlc-role">${ROLE_LABELS[m.role]||m.role}</div>
+          </div>
+        </div>
+        <div class="dlc-inputs">
+          <div class="dlc-input-group">
+            <label>🎬 Reels soni</label>
+            <input class="dlc-input" type="number" min="0" id="dlr-${m.id}" value="${existing.reels||existing.videos||0}">
+          </div>
+          <div class="dlc-input-group">
+            <label>📱 Story soni</label>
+            <input class="dlc-input" type="number" min="0" id="dls-${m.id}" value="${existing.stories||0}">
+          </div>
+        </div>
+        <div class="dlc-totals" id="dlc-totals-${m.id}">
+          <div class="dlc-total-chip"><strong style="color:#f077a4">${weekReels}</strong>Hafta reels</div>
+          <div class="dlc-total-chip"><strong style="color:var(--warn)">${weekStories}</strong>Hafta story</div>
+          <div class="dlc-total-chip"><strong style="color:#f077a4">${monthReels}</strong>Oy reels</div>
+          <div class="dlc-total-chip"><strong style="color:var(--warn)">${monthStories}</strong>Oy story</div>
+        </div>
+        <button class="dlc-save-btn" onclick="saveDailyLog('${m.id}')">💾 Saqlash</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateDlcTotals(memberId) {
+  // Just visual — actual totals updated on save
+}
+
+function saveDailyLog(memberId) {
+  const logDate = document.getElementById('logDate').value || new Date().toISOString().slice(0,10);
+  const reels = parseInt(document.getElementById('dlr-'+memberId).value)||0;
+  const stories = parseInt(document.getElementById('dls-'+memberId).value)||0;
+  const data = getData();
+  if (!data.dailyLogs) data.dailyLogs = [];
+  const idx = data.dailyLogs.findIndex(l => l.memberId===memberId && l.date===logDate);
+  if (idx > -1) {
+    data.dailyLogs[idx] = {...data.dailyLogs[idx], reels, stories, videos: reels};
+  } else {
+    data.dailyLogs.push({id:genId(), memberId, date:logDate, reels, stories, videos: reels});
+  }
+  saveData(data);
+  showToast('Saqlandi ✓');
+  renderDailyLogGrid();
+  renderTeam();
+  renderSummary(currentSummaryTab);
+}
+
+function saveAllDailyLogs() {
+  const data = getData();
+  const members = data.team || [];
+  members.forEach(m => {
+    const rEl = document.getElementById('dlr-'+m.id);
+    const sEl = document.getElementById('dls-'+m.id);
+    if (!rEl) return;
+    const logDate = document.getElementById('logDate').value || new Date().toISOString().slice(0,10);
+    const reels = parseInt(rEl.value)||0;
+    const stories = parseInt(sEl.value)||0;
+    if (!data.dailyLogs) data.dailyLogs = [];
+    const idx = data.dailyLogs.findIndex(l => l.memberId===m.id && l.date===logDate);
+    if (idx > -1) {
+      data.dailyLogs[idx] = {...data.dailyLogs[idx], reels, stories, videos: reels};
+    } else {
+      data.dailyLogs.push({id:genId(), memberId:m.id, date:logDate, reels, stories, videos: reels});
+    }
+  });
+  saveData(data);
+  showToast('Barcha ma\'lumotlar saqlandi ✓');
+  renderDailyLogGrid();
+  renderTeam();
+  renderSummary(currentSummaryTab);
+}
+
+// ===========================
+// SUMMARY
+// ===========================
+let currentSummaryTab = 'week';
+
+function setSummaryTab(tab, el) {
+  currentSummaryTab = tab;
+  document.querySelectorAll('.summary-tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderSummary(tab);
+}
+
+function renderSummary(tab) {
+  const data = getData();
+  const members = data.team || [];
+  const logs = data.dailyLogs || [];
+  const now = new Date();
+  const el = document.getElementById('summaryContent');
+  if (!el) return;
+
+  let rangeStart, rangeLabel, weekOrMonth;
+  if (tab === 'week') {
+    rangeStart = new Date(now); rangeStart.setDate(now.getDate()-6); rangeStart.setHours(0,0,0,0);
+    rangeLabel = 'So\'nggi 7 kun';
+    weekOrMonth = 'hafta';
+  } else {
+    rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthNames = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+    rangeLabel = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+    weekOrMonth = 'oy';
+  }
+
+  const rangeLogs = logs.filter(l => new Date(l.date) >= rangeStart);
+  const totalReels = rangeLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+  const totalStories = rangeLogs.reduce((s,l)=>s+(l.stories||0),0);
+  const totalContent = totalReels + totalStories;
+
+  // Per-member breakdown
+  const memberStats = members.map(m => {
+    const mLogs = rangeLogs.filter(l=>l.memberId===m.id);
+    const r = mLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+    const s = mLogs.reduce((s,l)=>s+(l.stories||0),0);
+    return {...m, videos:r, stories:s, total:r+s};
+  }).sort((a,b)=>b.total-a.total);
+
+  const colors = ['#2272ff','#22c55e','#8b5cf6','#f59e0b','#ef4444','#06b6d4'];
+
+  const summaryText = generateSummaryText(memberStats, totalReels, totalStories, rangeLabel, weekOrMonth, tab);
+
+  el.innerHTML = `
+    <div class="summary-card">
+      <div style="font-size:13px;font-weight:700;color:var(--gray3);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">📊 ${rangeLabel} — Umumiy statistika</div>
+      <div class="summary-grid">
+        <div class="summary-stat">
+          <div class="ss-num" style="color:#f077a4">${totalReels}</div>
+          <div class="ss-label">🎬 Jami reels</div>
+        </div>
+        <div class="summary-stat">
+          <div class="ss-num" style="color:var(--warn)">${totalStories}</div>
+          <div class="ss-label">📱 Jami story</div>
+        </div>
+        <div class="summary-stat">
+          <div class="ss-num" style="color:var(--success)">${totalContent}</div>
+          <div class="ss-label">📦 Jami content</div>
+        </div>
+        <div class="summary-stat">
+          <div class="ss-num" style="color:#a78bfa">${members.length}</div>
+          <div class="ss-label">👥 Xodimlar</div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        ${memberStats.map((m,i) => {
+          const pct = totalContent > 0 ? Math.round((m.total/totalContent)*100) : 0;
+          const avatarHtml = m.photo
+            ? `<img src="${m.photo}" style="width:100%;height:100%;object-fit:cover;">`
+            : (ROLE_ICONS[m.role]||'👤');
+          return `
+            <div class="member-row-summary">
+              <div class="mrs-avatar" style="background:${colors[i%6]}22">${avatarHtml}</div>
+              <div>
+                <div class="mrs-name">${escapeHtml(m.name)}</div>
+                <div style="font-size:11px;color:var(--gray3)">${ROLE_LABELS[m.role]||m.role}</div>
+              </div>
+              <div class="mrs-chips">
+                <span class="mrs-chip" style="background:rgba(225,48,108,0.12);color:#f077a4">🎬 ${m.videos}</span>
+                <span class="mrs-chip" style="background:rgba(245,158,11,0.12);color:var(--warn)">📱 ${m.stories}</span>
+                <span class="mrs-chip" style="background:rgba(34,197,94,0.12);color:var(--success)">${pct}%</span>
+              </div>
+              <div style="min-width:80px">
+                <div class="week-bar-track"><div class="week-bar-fill" style="width:${pct}%;background:${colors[i%6]}"></div></div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="summary-text">${summaryText}</div>
+    </div>
+  `;
+}
+
+function generateSummaryText(memberStats, totalReels, totalStories, rangeLabel, weekOrMonth, tab) {
+  if (!memberStats.length) return '<em style="color:var(--gray3)">Ma\'lumot kiritilmagan.</em>';
+  const top = memberStats[0];
+  const bottom = memberStats[memberStats.length-1];
+  const totalContent = totalReels + totalStories;
+  const avgPerMember = memberStats.length ? Math.round(totalContent/memberStats.length) : 0;
+
+  const days = tab === 'week' ? 7 : new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate();
+  const dailyAvg = days > 0 ? (totalContent/days).toFixed(1) : 0;
+
+  let text = `<strong>${rangeLabel}</strong> davomida jamoa jami <strong>${totalReels} ta reels</strong> va <strong>${totalStories} ta story</strong> yaratdi. `;
+  text += `Umumiy content: <strong>${totalContent} ta</strong>, kunlik o'rtacha: <strong>${dailyAvg} ta</strong>. `;
+
+  if (top && top.total > 0) {
+    text += `<br><br>🏆 <strong>Eng faol xodim: ${escapeHtml(top.name)}</strong> — ${top.videos} reels, ${top.stories} story (jami ${top.total} ta). `;
+  }
+  if (memberStats.length > 1 && bottom.total < top.total) {
+    text += `📉 <strong>${escapeHtml(bottom.name)}</strong> bu ${weekOrMonth}da ${bottom.total} ta content yaratdi. `;
+  }
+  text += `<br><br>Xodim boshiga o'rtacha: <strong>${avgPerMember} ta content</strong>. `;
+
+  if (totalReels > totalStories) {
+    text += `Reels content ustunlik qilmoqda (${Math.round(totalReels/(totalContent||1)*100)}%).`;
+  } else if (totalStories > totalReels) {
+    text += `Story content ko'proq yaratildi (${Math.round(totalStories/(totalContent||1)*100)}%).`;
+  } else {
+    text += `Reels va story teng taqsimlangan.`;
+  }
+
+  return text;
+}
+
+// ===========================
+// EXCEL EXPORT
+// ===========================
+function exportTeamExcel() {
+  const data = getData();
+  const members = data.team || [];
+  const logs = data.dailyLogs || [];
+  const now = new Date();
+
+  if (!members.length) { showToast('Xodimlar yo\'q', 'error'); return; }
+
+  // Build CSV content (Excel-compatible)
+  const rows = [];
+  rows.push(['SMM-SAM Xodimlar Hisoboti']);
+  rows.push(['Sana:', now.toLocaleDateString('uz-UZ')]);
+  rows.push([]);
+
+  // Member summary
+  rows.push(['# ', 'Ism', 'Lavozim', 'Haftalik Video', 'Haftalik Story', 'Oylik Video', 'Oylik Story', 'Jami Video', 'Jami Story', 'Oylik Reja', 'Kontakt']);
+
+  const weekAgo = new Date(now); weekAgo.setDate(now.getDate()-6); weekAgo.setHours(0,0,0,0);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  members.forEach((m, i) => {
+    const memberLogs = logs.filter(l => l.memberId === m.id);
+    const weekLogs = memberLogs.filter(l => new Date(l.date) >= weekAgo);
+    const monthLogs = memberLogs.filter(l => new Date(l.date) >= monthStart);
+    rows.push([
+      i+1,
+      m.name,
+      ROLE_LABELS[m.role]||m.role,
+      weekLogs.reduce((s,l)=>s+(l.videos||0),0),
+      weekLogs.reduce((s,l)=>s+(l.stories||0),0),
+      monthLogs.reduce((s,l)=>s+(l.videos||0),0),
+      monthLogs.reduce((s,l)=>s+(l.stories||0),0),
+      memberLogs.reduce((s,l)=>s+(l.videos||0),0),
+      memberLogs.reduce((s,l)=>s+(l.stories||0),0),
+      m.monthlyTarget||0,
+      m.contact||'',
+    ]);
+  });
+
+  rows.push([]);
+  rows.push(['Kunlik Tafsilot']);
+  rows.push(['Sana', 'Xodim', 'Lavozim', 'Video', 'Story']);
+
+  const sortedLogs = [...logs].sort((a,b) => new Date(b.date)-new Date(a.date));
+  sortedLogs.forEach(l => {
+    const m = members.find(x=>x.id===l.memberId);
+    if (!m) return;
+    rows.push([l.date, m.name, ROLE_LABELS[m.role]||m.role, l.videos||0, l.stories||0]);
+  });
+
+  // Convert to CSV
+  const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `xodimlar-hisobot-${now.toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('Excel hisobot yuklab olindi 📊');
+}
+
+// ===========================
+// DASHBOARD CHARTS
+// ===========================
+function renderDashCharts(posts) {
+  // Donut: content types
+  const reels = posts.filter(p=>p.contentType==='reels').length;
+  const story = posts.filter(p=>p.contentType==='story').length;
+  const video = posts.filter(p=>p.contentType==='video').length;
+  const post = posts.filter(p=>!p.contentType||p.contentType==='post').length;
+  const total = posts.length || 1;
+  const types = [
+    {label:'Reels', count:reels, color:'#E1306C'},
+    {label:'Story', count:story, color:'#f59e0b'},
+    {label:'Video', count:video, color:'#2272ff'},
+    {label:'Post', count:post, color:'#8b5cf6'},
+  ].filter(t=>t.count>0);
+
+  const donutEl = document.getElementById('dashDonut');
+  if (donutEl) {
+    if (!types.length) {
+      donutEl.innerHTML = `<div style="color:var(--gray3);font-size:13px">Ma'lumot yo'q</div>`;
+    } else {
+      // SVG donut
+      const size = 100, cx = 50, cy = 50, r = 36, sw = 16;
+      const circumference = 2 * Math.PI * r;
+      let offset = 0;
+      let arcs = '';
+      types.forEach(t => {
+        const pct = t.count / total;
+        const dash = pct * circumference;
+        const gap = circumference - dash;
+        arcs += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${t.color}" stroke-width="${sw}" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offset}" style="transition:stroke-dasharray 0.5s"/>`;
+        offset += dash;
+      });
+      donutEl.innerHTML = `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg);flex-shrink:0">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="${sw}"/>
+          ${arcs}
+        </svg>
+        <div class="donut-legend">
+          ${types.map(t=>`
+            <div class="donut-legend-item">
+              <div class="donut-dot" style="background:${t.color}"></div>
+              <span style="color:var(--gray3)">${t.label}</span>
+              <strong>${t.count}</strong>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+  }
+
+  // Bar: last 7 days
+  const barEl = document.getElementById('dashBarChart');
+  if (barEl) {
+    const days = [];
+    const dayLabels = ['Ya','Du','Se','Ch','Pa','Ju','Sh'];
+    for (let i=6; i>=0; i--) {
+      const d = new Date(); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+      const cnt = posts.filter(p=>{const pd=new Date(p.date);pd.setHours(0,0,0,0);return pd.getTime()===d.getTime();}).length;
+      days.push({label:dayLabels[d.getDay()], cnt, isToday:i===0});
+    }
+    const max = Math.max(...days.map(d=>d.cnt), 1);
+    barEl.innerHTML = days.map(d => `
+      <div class="bar-item">
+        <div class="bar-val" style="color:${d.isToday?'var(--blue3)':'var(--gray3)'}">${d.cnt||''}</div>
+        <div class="bar-fill" style="height:${Math.round((d.cnt/max)*80)+4}px;background:${d.isToday?'var(--blue2)':'rgba(255,255,255,0.12)'}"></div>
+        <div class="bar-label" style="color:${d.isToday?'var(--blue3)':'var(--gray4)'}">${d.label}</div>
+      </div>
+    `).join('');
+  }
+}
+
+checkReadOnly();
+const initData = getData();
+applyTheme(initData.theme || 'dark');
+
+// Oxirgi ochiq sahifani tiklash
+const _validPages = ['dashboard','planner','calendar','channels','telegram','instagram','scenarios','strategy','team','videostats','xulosa','analysis','settings'];
+const _savedPage = localStorage.getItem('smmsam_activePage') || 'dashboard';
+const _startPage = _validPages.includes(_savedPage) ? _savedPage : 'dashboard';
+showPage(_startPage);
+
+// ===========================
+// XULOSA (DEDICATED SUMMARY PAGE)
+// ===========================
+
+function setXulosaTabs(tab, el) {
+  currentXulosTab = tab;
+  document.querySelectorAll('#page-xulosa .tab').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderXulosa(tab);
+}
+
+function renderXulosa(tab) {
+  const data = getData();
+  const members = data.team || [];
+  const logs = data.dailyLogs || [];
+  const now = new Date();
+  const el = document.getElementById('xulosaSummaryContent');
+  if (!el) return;
+
+  const monthNames = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+  let rangeStart, rangeLabel, rangeDesc, weekOrMonth, days;
+
+  if (tab === 'week') {
+    rangeStart = new Date(now); rangeStart.setDate(now.getDate()-6); rangeStart.setHours(0,0,0,0);
+    const endStr = now.toLocaleDateString('uz-UZ',{day:'2-digit',month:'short'});
+    const startStr = rangeStart.toLocaleDateString('uz-UZ',{day:'2-digit',month:'short'});
+    rangeLabel = 'Haftalik Xulosa';
+    rangeDesc = startStr + ' \u2013 ' + endStr + ', ' + now.getFullYear();
+    weekOrMonth = 'hafta';
+    days = 7;
+  } else {
+    rangeStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    rangeLabel = 'Oylik Xulosa';
+    rangeDesc = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+    weekOrMonth = 'oy';
+    days = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  }
+
+  const rangeLogs = logs.filter(l => new Date(l.date) >= rangeStart);
+  const totalReels = rangeLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+  const totalStories = rangeLogs.reduce((s,l)=>s+(l.stories||0),0);
+  const totalContent = totalReels + totalStories;
+  const dailyAvg = days > 0 ? (totalContent/days).toFixed(1) : 0;
+
+  const memberStats = members.map(m => {
+    const mLogs = rangeLogs.filter(l=>l.memberId===m.id);
+    const r = mLogs.reduce((s,l)=>s+(l.reels||l.videos||0),0);
+    const s = mLogs.reduce((s,l)=>s+(l.stories||0),0);
+    return {...m, reels:r, stories:s, total:r+s};
+  }).sort((a,b)=>b.total-a.total);
+
+  const top = memberStats[0];
+  const bottom = memberStats[memberStats.length-1];
+  const avgPerMember = members.length ? Math.round(totalContent/members.length) : 0;
+  const colors = ['#2272ff','#22c55e','#8b5cf6','#f59e0b','#ef4444','#06b6d4'];
+  const rankEmojis = ['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
+  const maxMemberTotal = memberStats.length ? Math.max(...memberStats.map(m=>m.total),1) : 1;
+
+  const insights = [];
+  if (totalContent === 0) {
+    insights.push('Bu davrda hech qanday content kiritilmagan. Xodimlardan kunlik kiritishni so\'rang.');
+  } else {
+    if (top && top.total > 0) insights.push('<strong>' + escapeHtml(top.name) + '</strong> eng faol xodim — ' + top.reels + ' ta reels va ' + top.stories + ' ta story (jami <strong>' + top.total + ' ta</strong>).');
+    if (memberStats.length > 1 && bottom.total === 0) insights.push('\u26A0\uFE0F <strong>' + escapeHtml(bottom.name) + '</strong> bu ' + weekOrMonth + 'da hech qanday content yaratmadi.');
+    else if (memberStats.length > 1 && bottom.total < avgPerMember) insights.push('\uD83D\uDCC9 <strong>' + escapeHtml(bottom.name) + '</strong> bu ' + weekOrMonth + 'da o\'rtachadan kam — ' + bottom.total + ' ta content.');
+    if (totalReels > totalStories) insights.push('\uD83C\uDFAC Reels content ustunlik qilmoqda — ' + totalReels + ' ta (' + Math.round(totalReels/totalContent*100) + '%).');
+    else if (totalStories > totalReels) insights.push('\uD83D\uDCF1 Story content ko\'proq — ' + totalStories + ' ta (' + Math.round(totalStories/totalContent*100) + '%).');
+    else insights.push('\u2696\uFE0F Reels va story teng taqsimlangan — har biri ' + totalReels + ' ta.');
+    insights.push('\uD83D\uDCC5 Kunlik o\'rtacha <strong>' + dailyAvg + ' ta</strong> content. Xodim boshiga <strong>' + avgPerMember + ' ta</strong>.');
+  }
+
+  el.innerHTML = `
+    <div class="xulosa-hero">
+      <div class="xulosa-title">${rangeLabel}</div>
+      <div class="xulosa-range">${rangeDesc}</div>
+      <div class="xulosa-big-stats">
+        <div class="xulosa-big-stat">
+          <div class="xulosa-big-num" style="color:#f077a4">${totalReels}</div>
+          <div class="xulosa-big-lbl">🎬 Reels</div>
+        </div>
+        <div class="xulosa-big-stat">
+          <div class="xulosa-big-num" style="color:var(--warn)">${totalStories}</div>
+          <div class="xulosa-big-lbl">📱 Story</div>
+        </div>
+        <div class="xulosa-big-stat">
+          <div class="xulosa-big-num" style="color:var(--success)">${totalContent}</div>
+          <div class="xulosa-big-lbl">📦 Jami</div>
+        </div>
+        <div class="xulosa-big-stat">
+          <div class="xulosa-big-num" style="color:var(--blue3)">${dailyAvg}</div>
+          <div class="xulosa-big-lbl">📅 Kunlik o'rt</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="xulosa-section">
+      <div class="xulosa-section-title">🏆 Xodimlar reytingi</div>
+      ${!memberStats.length ? '<div style="color:var(--gray3);font-size:14px">Xodimlar qo\'shilmagan</div>' : memberStats.map((m,i) => {
+        const pct = maxMemberTotal > 0 ? Math.round((m.total/maxMemberTotal)*100) : 0;
+        const avatarHtml = m.photo ? '<img src="' + m.photo + '" style="width:100%;height:100%;object-fit:cover;">' : (ROLE_ICONS[m.role]||'👤');
+        const rankBg = i===0?'rgba(255,215,0,0.15)':i===1?'rgba(192,192,192,0.15)':i===2?'rgba(205,127,50,0.15)':'rgba(255,255,255,0.06)';
+        return `
+          <div class="xulosa-member-row">
+            <div class="xulosa-rank" style="background:${rankBg}">${rankEmojis[i]||i+1}</div>
+            <div class="xulosa-avatar" style="background:${colors[i%6]}22">${avatarHtml}</div>
+            <div class="xulosa-member-info">
+              <div class="xulosa-member-name">${escapeHtml(m.name)}</div>
+              <div class="xulosa-member-role">${ROLE_LABELS[m.role]||m.role}</div>
+              <div style="margin-top:6px"><div class="xulosa-bar-track" style="height:6px"><div class="xulosa-bar-fill" style="width:${pct}%;background:${colors[i%6]}"></div></div></div>
+            </div>
+            <div class="xulosa-chips">
+              <span class="xulosa-chip" style="background:rgba(225,48,108,0.12);color:#f077a4">🎬 ${m.reels}</span>
+              <span class="xulosa-chip" style="background:rgba(245,158,11,0.12);color:var(--warn)">📱 ${m.stories}</span>
+              <span class="xulosa-chip" style="background:rgba(34,197,94,0.12);color:var(--success);font-size:13px;padding:4px 12px">${m.total}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="xulosa-section">
+      <div class="xulosa-section-title">📊 Content taqsimoti</div>
+      ${[
+        {l:'🎬 Reels', v:totalReels, c:'#E1306C'},
+        {l:'📱 Story', v:totalStories, c:'#f59e0b'},
+      ].map(item => `
+        <div class="xulosa-bar-row">
+          <div class="xulosa-bar-label">${item.l}</div>
+          <div class="xulosa-bar-track"><div class="xulosa-bar-fill" style="width:${totalContent>0?Math.round(item.v/totalContent*100):0}%;background:${item.c}"></div></div>
+          <div class="xulosa-bar-val" style="color:${item.c}">${item.v}</div>
+        </div>
+      `).join('')}
+      <div style="font-size:12px;color:var(--gray3);margin-top:8px">Jami: ${totalContent} ta content, ${days} kunlik davr</div>
+    </div>
+
+    <div class="xulosa-section">
+      <div class="xulosa-section-title">💡 Tahlil va xulosalar</div>
+      ${insights.map(ins => '<div class="xulosa-insight">' + ins + '</div>').join('')}
+    </div>
+  `;
+}
+
+function printXulosa() {
+  window.print();
+}
+</script>
+</body>
+</html>
